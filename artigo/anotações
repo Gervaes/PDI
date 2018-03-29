@@ -1,0 +1,19 @@
+  Estou estudando sobre o método de binarização, não sei se vai ser importante na implementação,
+mas pelo menos pro seminário é bom.
+  Primeiro, o nome da técnica de binarização (ou segmentação) da imagem que o autor usa é
+Sauvola's Segmentation, ou Adaptive Threshold (limiar adaptativo).
+  Para aplicar essa técnica, a imagem tem que estar definida em NÍVEIS DE CINZA, e ela vai ser
+dividida em FUNDO e OBJETO.
+  A lógica do Global Threshold (limiar global, versão mais simples que deu origem ao A.T.) disso
+é analisar as instensidades do histograma e achar uma região T nele que possa servir como limite para separar o
+objeto do fundo. Nesse algoritmo T é único para toda a imagem, o que pode gerar maus resultados.
+  No A.T., o limiar é adaptativo, ou seja, a lógica é subdividir a imagem em pequenas janelas e em cada janela
+calcular um limiar e fazer a divisão. Isso resulta num resultado mais limpo e fiel a imagem original.
+
+LINKS QUE EU USEI:
+https://www.youtube.com/watch?v=lbagfPhojcA
+https://sites.google.com/site/imgprocgpu/limiarizacao
+http://www.ic.unicamp.br/~afalcao/mo443/slides-aula25a.pdf
+
+Att,
+Delay ~
