@@ -92,3 +92,132 @@ o método.
     Descritores de Fourier em relação com suavização de contorno.
 */
 
+//Leitura da imagem
+mammogram = imread('C:\Users\Grrv\Desktop\PDI\artigo\mamografia.jpg');
+mammogram = rgb2gray(mammogram);
+
+//Dimensões da imagem
+columns = 583;
+rows = 822;
+
+w = 3; //window
+k = 0.2; //[0.2,0.5] starting with 0.2
+
+//Binarization of the input image
+function [value]=Binarization(i,j)
+    if mammogram(i,j)<= Threshold(i,j) then
+        value = 0;
+    else
+        value = 255;
+    end
+endfunction
+
+//for each pixel T(i,j) = m(i,j)[1+k{(s(i,j)/R)-1}]
+function [value]=Threshold(i,j)
+    value = LocalMean(i,j)*(1+k*(StardardDeviation(i,j)/R)-1);
+endfunction
+
+//local mean m(i,j) = Is(i+w/2,j+w/2) + Is(i-w/2,j-w/2)- Is(i+w/2,j-w/2) - Is(i-w/2,j+w/2)
+function [value]=LocalMean(i,j)
+    value = IntegralImage(i+w/2,j+w/2)+IntegralImage(i-w/2,j-w/2)-IntegralImage(i+w/2,j-w/2)-IntegralImage(i-w/2,j+w/2);
+endfunction
+
+//standard deviation s²(i,j) = 1/w² EE I²(k,l)-m²(i,j) 
+//                                  ^^(Somatórios com k=i-w/2 até i+w/2 
+//                                                    l=j-w/2 até j+w/2 )
+function [value]=StardardDeviation(i,j)
+    //FALTA FAZER ESSE DEMÔNIO
+endfunction
+
+//Integral image(i,j) = EE I(k,l)
+//                      ^^(Somatórios de k=0 até i e l=0 até j)
+function [value]=IntegralImage(i,j)
+    value =0;
+    for k=1:i
+        for l=1:j
+            value = value + mammogram(k,l);
+        end
+    end
+endfunction
+
+//Teste de cada função separadamente
+x=2;
+z=2;
+
+mprintf('mammogram(%i,%i)=%i    ',x-1,z-1,mammogram(x-1,z-1));
+mprintf('mammogram(%i,%i)=%i    ',x-1,z,mammogram(x-1,z));
+mprintf('mammogram(%i,%i)=%i\n',x-1,z+1,mammogram(x-1,z+1));
+mprintf('mammogram(%i,%i)=%i    ',x,z-1,mammogram(x,z-1));
+mprintf('mammogram(%i,%i)=%i    ',x,z,mammogram(x,z));
+mprintf('mammogram(%i,%i)=%i\n',x,z+1,mammogram(x,z+1));
+mprintf('mammogram(%i,%i)=%i    ',x+1,z-1,mammogram(x+1,z-1));
+mprintf('mammogram(%i,%i)=%i    ',x+1,z,mammogram(x+1,z));
+mprintf('mammogram(%i,%i)=%i\n',x+1,z+1,mammogram(x+1,z+1));
+
+num = IntegralImage(3,3);
+mprintf('\nTESTE FUNÇÃO INTEGRALIMAGE\n');
+mprintf('IntegralImage(%i,%i)=%i\n\n-------------------\n',3,3,num);
+
+mprintf('Is(%i,%i)=%i    ',x-1,z-1,IntegralImage(x-1,z-1));
+mprintf('Is(%i,%i)=%i    ',x-1,z,IntegralImage(x-1,z));
+mprintf('Is(%i,%i)=%i\n',x-1,z+1,IntegralImage(x-1,z+1));
+mprintf('Is(%i,%i)=%i    ',x,z-1,IntegralImage(x,z-1));
+mprintf('Is(%i,%i)=%i    ',x,z,IntegralImage(x,z));
+mprintf('Is(%i,%i)=%i\n',x,z+1,IntegralImage(x,z+1));
+mprintf('Is(%i,%i)=%i    ',x+1,z-1,IntegralImage(x+1,z-1));
+mprintf('Is(%i,%i)=%i    ',x+1,z,IntegralImage(x+1,z));
+mprintf('Is(%i,%i)=%i\n',x+1,z+1,IntegralImage(x+1,z+1));
+
+num = LocalMean(2,2);
+mprintf('\nTESTE FUNÇÃO LOCALMEAN\n');
+mprintf('(%i,%i)%i + (%i,%i)%i - (%i,%i)%i - (%i,%i)%i\n',x+w/2,z+w/2,IntegralImage(x+w/2,z+w/2),x-w/2,z-w/2,IntegralImage(x-w/2,z-w/2),x+w/2,z-w/2,IntegralImage(x+w/2,z-w/2),x-w/2,z+w/2,IntegralImage(x-w/2,z+w/2));
+mprintf('LocalMean(%i,%i)=%i\n\n-------------------\n',50,50,num);
+
+/*
+//Binarizando imagem
+for i=1:rows
+    for j=1:columns
+        OutputImage(i,j) = Binarization(i,j);
+    end
+end
+
+//Visualizando histograma
+for k=1:256
+    histograma(k) = 0;
+end
+
+for i=1:linhas
+    for j=1:colunas
+        //if teste(i,j) > 2 then 
+            indice = double(teste(i,j) + 1);
+            histograma(indice) = histograma(indice) + 1;
+        //end 
+    end
+end
+
+figure;
+bar(histograma);
+
+figure;
+imshow(teste);
+
+
+MÉDIA LOCAL ALTERNATIVA CASO PRECISE TRATAR ACESSO A INDICES INDISPONÍVEIS
+function [value]=LocalMean(i,j)
+    value = 0;
+    //Tratamento pra não haver acesso em índice que não existe
+    if i+w/2 <= rows & j+w/2 <= columns then value = value + IntegralImage(i+w/2,j+w/2); end
+    if i-w/2 >= 0    & j-w/2 >= 0       then value = value + IntegralImage(i-w/2,j-w/2); end
+    if i+w/2 <= rows & j-w/2 >= 0       then value = value + IntegralImage(i+w/2,j-w/2); end
+    if i-w/2 >= 0    & j+w/2 <= columns then value = value + IntegralImage(i-w/2,j+w/2); end
+endfunction
+
+*/
+
+
+
+
+
+
+
+

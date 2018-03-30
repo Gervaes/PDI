@@ -11,7 +11,7 @@
 //Lendo nome da imagem de teste
 //name = input('Nome da imagem (ex: balao.png):','s');
 
-imagem = imread('teste.png');
+imagem = imread('C:\Users\Grrv\Desktop\PDI\teste.png');
 
 //Lendo número de linhas e colunas da imagem teste
 linhas = 465;//input('Número de linhas da imagem  :','s');
