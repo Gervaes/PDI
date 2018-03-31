@@ -5,9 +5,8 @@ Processamento Digital de Imagens
 Descrição do que deve ser feito para obtenção dos pixels de fronteira (seção 2.1)
 que serão usados posteriormente para obter uma fronteira suave usando FDs (seção 2.2)
 
-Descrevi tudo lá, basicamente uma tradução do artigo, pra não ter que ficar voltando ao artigo
-e poder focar um pouco só no código. Nóis, mlkada. Confia que vai dar bom. Hoje ainda, espero.
-Se após a goleada do Palmeiras eu ouvir uma zuera jogo tudo pro alto, está dito.
+Notícia boa: terminei implementação das funções
+Notícia ruim: DÁ TUDO ZERO NESSA MERDA
 
 [PASTA RUÍDOS]
 Implementados ruído gaussiano e uniforme com base no link:
