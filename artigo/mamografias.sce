@@ -1,11 +1,14 @@
 //Leitura da imagem
 
-mammogram = imread('C:\Users\Grrv\Desktop\PDI\artigo\teste.png');
+mammogram = imread('C:\Users\Grrv\Desktop\PDI\artigo\teste1.jpg');
 mammogram = rgb2gray(mammogram);
 
 //Dimensões da imagem
-columns = 15;
-rows = 15;
+columns = 40;
+rows = 40;
+w = 3; //window
+u = 0.2; //[0.2,0.5] starting with 0.2
+R = 1;
 
 //Binarization of the input image
 function [value]=Binarization(i,j)
@@ -22,7 +25,7 @@ function [value]=Threshold(i,j)
 endfunction
 
 //local mean m(i,j) = Is(i+w/2,j+w/2) + Is(i-w/2,j-w/2)- Is(i+w/2,j-w/2) - Is(i-w/2,j+w/2)
-function [value]=LocalMean(i,j)
+function [value]=LocalMeanDesejado(i,j)
     value = 0;
     value = double(value);
     //Tratamento pra não haver acesso em índice que não existe
@@ -32,6 +35,20 @@ function [value]=LocalMean(i,j)
     if i-w/2 >= 1     & j+w/2 < columns+1 then value = value - II(i-w/2,j+w/2); end
     
     //Dividing by the number of items in the window to know the LocalMean
+    value = double(value/(w*w));
+endfunction
+
+function [value]=LocalMean(i,j)
+    value = 0;
+    value = double(value);
+    for k=i-w/2:i+w/2
+        for l=j-w/2:j+w/2
+            if k >=1 & k < rows+1 & l >= 1 & l < columns+1 then
+                value = value + double(mammogram(k,l));
+            end
+        end
+    end
+    
     value = double(value/(w*w));
 endfunction
 
@@ -51,6 +68,8 @@ function [value]=StardardDeviation(i,j)
 
     value = double(double(value)/double(w*w));
     value = value - double(double(LM(i,j))*double(LM(i,j)));
+    //value = double(uint8(value));
+    //value = sqrt(value);
 endfunction
 
 //Integral image(i,j) = EE I(k,l)
@@ -66,16 +85,6 @@ function [value]=IntegralImage(i,j)
     value = double(value);
 endfunction
 
-w = 3; //window
-u = 0.2; //[0.2,0.5] starting with 0.2
-R = 1;
-
-//Teste de cada função separadamente
-//mammogram = [10,20,30,40;
-//             40,30,20,10;
-//             20,40,10,30;
-//             30,10,40,20]
-
 //Displaying Input image
 mprintf('\nInputImage:\n');
 for k=1:rows
@@ -88,7 +97,7 @@ end
 
 //Calculating IntegralImage for the whole image and putting it on the II matrix
 mprintf('\nIntegralImage:\n');
-II = double(II);
+//II = double(II);
 for k=1:rows
     for l=1:columns
         II(k,l) = IntegralImage(k,l);
@@ -111,7 +120,7 @@ end
 
 //Calculating StandardDeviation for the whole image
 mprintf('\nStandartDeviation:\n');
-SD = double(SD);
+//SD = double(SD);
 for k=1:rows
     for l=1:columns
         SD(k,l) = StardardDeviation(k,l);
@@ -134,7 +143,7 @@ mprintf('\nR = %i\n',R);
 
 //Calculating Threshold for the whole image
 mprintf('\nThreshold:\n');
-TH = double(TH);
+//TH = double(TH);
 for k=1:rows
     for l=1:columns
         TH(k,l) = double(Threshold(k,l));
