@@ -7,7 +7,7 @@ mammogram = rgb2gray(mammogram);
 columns = 40;
 rows = 40;
 w = 3; //window
-u = 0.2; //[0.2,0.5] starting with 0.2
+u = 0.15; //k
 R = 1;
 
 //Binarization of the input image
@@ -25,7 +25,7 @@ function [value]=Threshold(i,j)
 endfunction
 
 //local mean m(i,j) = Is(i+w/2,j+w/2) + Is(i-w/2,j-w/2)- Is(i+w/2,j-w/2) - Is(i-w/2,j+w/2)
-function [value]=LocalMeanDesejado(i,j)
+function [value]=LocalMeanx(i,j)
     value = 0;
     value = double(value);
     //Tratamento pra não haver acesso em índice que não existe
@@ -40,22 +40,24 @@ endfunction
 
 function [value]=LocalMean(i,j)
     value = 0;
+    count = 0;
     value = double(value);
-    for k=i-w/2:i+w/2
-        for l=j-w/2:j+w/2
+    for k=ceil(i-w/2):i+w/2
+        for l=ceil(j-w/2):j+w/2
             if k >=1 & k < rows+1 & l >= 1 & l < columns+1 then
                 value = value + double(mammogram(k,l));
+                count = count + 1;
             end
         end
     end
     
-    value = double(value/(w*w));
+    value = double(value/(count));
 endfunction
 
-//standard deviation s²(i,j) = 1/w² EE I²(k,l)-m²(i,j) 
+//standard deviation s²(i,j) = 1/w² EE I²(k,l) - m²(i,j) 
 //                                  ^^(Somatórios com k=i-w/2 até i+w/2 
 //                                                    l=j-w/2 até j+w/2 )
-function [value]=StardardDeviation(i,j)
+function [value]=StardardDeviationx(i,j)
     value = 0;
     value = double(value);
     for k=i-w/2:i+w/2
@@ -68,8 +70,24 @@ function [value]=StardardDeviation(i,j)
 
     value = double(double(value)/double(w*w));
     value = value - double(double(LM(i,j))*double(LM(i,j)));
-    //value = double(uint8(value));
     //value = sqrt(value);
+endfunction
+
+function [value]=StardardDeviation(i,j)
+    value = 0;
+    count = 0;
+    value = double(value);
+    for k=i-w/2:i+w/2
+        for l=j-w/2:j+w/2
+            if k >= 1 & l >= 1 & k < rows+1 & l < columns+1
+                value = value + double((double(mammogram(k,l))-double(LM(i,j)))*(double(mammogram(k,l))-double(LM(i,j))));
+                count = count + 1;
+            end
+        end
+    end
+
+    value = double(double(value)/double(count));
+    value = sqrt(value);
 endfunction
 
 //Integral image(i,j) = EE I(k,l)
