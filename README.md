@@ -6,7 +6,7 @@ Descrição do que deve ser feito para obtenção dos pixels de fronteira (seç�
 que serão usados posteriormente para obter uma fronteira suave usando FDs (seção 2.2)
 
 Notícia boa: terminei implementação das funções
-Notícia ruim: DÁ TUDO ZERO NESSA MERDA
+Notícia ruim: tá esquisitíssimo
 
 [PASTA RUÍDOS]
 Implementados ruído gaussiano e uniforme com base no link:
