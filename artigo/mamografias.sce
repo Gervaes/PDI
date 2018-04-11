@@ -1,7 +1,7 @@
 //Leitura da imagem
 
-mammogram = imread('C:\Users\Grrv\Desktop\PDI\artigo\mammogram.png');
-//mammogram = rgb2gray(mammogram);
+mammogram = imread('C:\Users\Grrv\Desktop\PDI\artigo\mammogram2.png');
+mammogram = rgb2gray(mammogram);
 
 //image size
 [rows,columns] = size(mammogram);
@@ -24,6 +24,15 @@ function [value]=Threshold(i,j)
 endfunction
 
 //local mean m(i,j) = Is(i+w/2,j+w/2) + Is(i-w/2,j-w/2)- Is(i+w/2,j-w/2) - Is(i-w/2,j+w/2)
+
+function [value]=LocalMeanx(i,j)
+    value = 0;
+    value = double(value);
+    if i > 1 then
+    end
+    m(i,j) = II(i+w/2,j+w/2) + II(i-w/2,j-w/2)- II(i+w/2,j-w/2) - II(i-w/2,j+w/2);
+endfunction
+
 function [value]=LocalMean(i,j)
     value = 0;
     count = 0;
@@ -58,7 +67,8 @@ function [value]=StardardDeviation(i,j)
 
     value = double(double(value)/double(count));
     value = value - double(floor(LM(i,j))*floor(LM(i,j)));
-    value = sqrt(value);
+    if(value > 0) then sqrt(double(value));
+    else value = 0; end
 endfunction
 
 //Integral image(i,j) = EE I(k,l)
@@ -66,11 +76,16 @@ endfunction
 function [value]=IntegralImage(i,j)
     value = 0;
     value = double(value);
-    for k=1:i
-        for l=1:j
-            value = double(double(value) + double(mammogram(k,l)));
-        end
-    end 
+    value = double(value + double(mammogram(k,l)));
+    if k > 1 & l > 1 then
+         value = double(value - double(II(k-1,l-1)));
+    end
+    if k > 1 then
+        value = double(value + double(II(k-1,l)));
+    end
+    if l > 1 then
+        value = double(value + double(II(k,l-1)));
+    end
     value = double(value);
 endfunction
 
@@ -89,20 +104,20 @@ for k=1:rows
 end
 
 //Calculating IntegralImage for the whole image and putting it on the II matrix
-//mprintf('\nIntegralImage:\n');
+mprintf('\nIntegralImage:\n');
 for k=1:rows
     for l=1:columns
-        //II(k,l) = IntegralImage(k,l);
-        //mprintf('%7i ',II(k,l));
+        II(k,l) = IntegralImage(k,l);
+        mprintf('%7i ',II(k,l));
     end
-    //mprintf('\n');
+    mprintf('\n');
 end
 
 //Calculating LocalMean for the whole image with window size 3 and putting it on the LM matrix  
 mprintf('\nLocalMean:\n');
 for k=1:rows
     for l=1:columns
-        LM(k,l) = double(round(LocalMean(k,l)));
+        LM(k,l) = round(LocalMean(k,l));
         mprintf('%10.2f ',LM(k,l));
     end
     mprintf('\n');
