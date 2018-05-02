@@ -103,3 +103,5 @@ for i=1:x
     printf("\n");
 end
 
+//Escritas de imagem em arquivo
+imshow(img3);
