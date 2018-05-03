@@ -1,19 +1,19 @@
 //lendo imagens
-img1 = imread('D:\github\PDI\aula4\parte2\img1.bmp');
-img2 = imread('D:\github\PDI\aula4\parte2\img2.bmp');
-img3 = imread('D:\github\PDI\aula4\parte2\img3.bmp');
+imgTeste = imread('D:\github\PDI\aula4\parte2\teste.png');
+//img1 = imread('D:\github\PDI\aula4\parte2\img1.bmp');
+//img2 = imread('D:\github\PDI\aula4\parte2\img2.bmp');
+//img3 = imread('D:\github\PDI\aula4\parte2\img3.bmp');
 
-[x,y] = size(img1);
+[x,y] = size(imgTeste);
 
 //conversão de RGB para HSI
-imgAux = img1;
+imgAux = imgTeste;
 scale = 256;
 
 for i=1:x
     for j=1:y
-        aux = double(double(imgAux(i,j))/double(scale));
-        imgAux(i,j) = aux;
-        printf("%.5f", imgAux(i,j));
+        aux2(i,j) = double(double(imgTeste(i,j))/double(scale));
     end
-    printf("\n");
 end
+
+printf("Valor teste (posição 1x1): %.5f\n", aux2(1,1));
