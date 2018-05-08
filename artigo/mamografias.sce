@@ -1,6 +1,6 @@
 //Leitura da imagem
 
-mammogram = imread('C:\Users\Grrv\Desktop\PDI\artigo\mammogram2.png');
+mammogram = imread('C:\Users\marco\OneDrive\Documentos\GitHub\PDI\artigo\mammogram.png');
 mammogram = rgb2gray(mammogram);
 
 //image size
@@ -168,38 +168,30 @@ imshow(mammogram);
 figure;
 imshow(B);
 
-/*
-//Visualizando histograma
-for k=1:256
-    histograma(k) = 0;
-end
+//inicialização do processo de suavização de contorno usando morfologia matemática (operação fechamento: dilatação e depois erosão)
 
-for i=1:rows
-    for j=1:columns
-        //if teste(i,j) > 2 then 
-            indice = double(mammogram(i,j) + 1);
-            histograma(indice) = histograma(indice) + 1;
-        //end 
+//declaração de elemento estruturante (matriz 7x7 com origem no pixel central)
+EE = [1, 1, 1, 1, 1, 1, 1;
+      1, 1, 1, 1, 1, 1, 1;
+      1, 1, 1, 1, 1, 1, 1;
+      1, 1, 1, 1, 1, 1, 1;
+      1, 1, 1, 1, 1, 1, 1;
+      1, 1, 1, 1, 1, 1, 1;
+      1, 1, 1, 1, 1, 1, 1];
+
+image = B;
+
+for k=1:rows
+    for l=1:columns
+        if EE(4,4) == image(k,l) then
+            for m=(k-3):(k+3), o=1:7
+                for n=(l-3):(l+3), p=1:7
+                    image(m,n) = EE(o,p);
+                end
+            end
+        end
     end
 end
 
 figure;
-bar(histograma);
-
-figure;
-imshow(mammogram);
-
-function [value]=LocalMeanx(i,j)
-    value = 0;
-    value = double(value);
-    //Tratamento pra não haver acesso em índice que não existe
-    if i+w/2 < rows+1 & j+w/2 < columns+1 then value = value + II(i+w/2,j+w/2); end
-    if i-w/2 >= 1     & j-w/2 >= 1        then value = value + II(i-w/2,j-w/2); end
-    if i+w/2 < rows+1 & j-w/2 >= 1        then value = value - II(i+w/2,j-w/2); end
-    if i-w/2 >= 1     & j+w/2 < columns+1 then value = value - II(i-w/2,j+w/2); end
-    
-    //Dividing by the number of items in the window to know the LocalMean
-    value = double(value/(w*w));
-endfunction
-
-*/
+imshow(image);
