@@ -1,8 +1,9 @@
 //CÁLCULO DE REALCE E AGUÇAMENTO: MÁSCARA h1 NÃO-NORMALIZADA
 
 //lendo imagens e capturando dimensões
-img = imread("D:\github\PDI\aula3\teste.png");
-[x,y] = size(img);
+img = imread("C:\Users\Grrv\Desktop\PDI\aula3\parte 1\teste.jpg");
+img = rgb2gray(img);
+[rows,columns] = size(img);
 
 h1 = [0, -1, 0;
       -1, 8, -1;
@@ -12,87 +13,82 @@ maskGeradora = [0, 0, 0;
                 0, 9, 0;
                 0, 0, 0];
 
-soma = 0;
-
-printf("MATRIZ ORIGINAL:\n");
-for i=1:x
-    for j=1:y
-        printf("[%d] ", img(i,j));
+function []=PrintMatrix(rows,columns,image)
+    for i=1:rows
+        for j=1:columns
+            printf("[%d] ", image(i,j));
+        end
+        printf("\n");
     end
-    printf("\n");
-end
+endfunction
 
-//MÁSCARA 3x3 REALCE
-img1 = img;
+function [image]=Agucamento()
+    for i=1:rows
+        for j=1:rows
+            image(i,j) = detector(i,j) + geradora(i,j);
+        end
+    end
+endfunction
 
-printf("\n");
+function [image]=MascaraGeradora(w)
+    soma = 0;
+    image = img;
+    
+    for i=1:rows
+        for j=1:columns
+            if rows-i >= w-1 & columns-j >= w-1 then
+                for m=i:i+w-1
+                    for n=j:j+w-1
+                        soma = double(soma + double(img(m,n))*(maskGeradora(m-i+1,n-j+1)));
+                    end
+                end
+                image(i+floor(w/2),j+floor(w/2)) = abs(soma);
+                soma = 0;
+            end
+        end
+    end
+endfunction
 
 //cálculo do detector de altas frequências (h1 não-normalizado)
-for i=1:x
-    for j=1:y
-        if x-i >= 2 & y-j >= 2 then
-            for m=i:i+2
-                for n=j:j+2
-                    soma = soma + double(img(m,n))*(h1(m-i+1,n-j+1));
+function [image]=Detector(w)
+    soma = 0;
+    image = img;
+    
+    for i=1:rows
+        for j=1:columns
+            if rows-i >= w-1 & columns-j >= w-1 then
+                for m=i:i+w-1
+                    for n=j:j+w-1
+                        soma = double(soma + double(img(m,n))*(h1(m-i+1,n-j+1)));
+                    end
                 end
+                image(i+floor(w/2),j+floor(w/2)) = abs(soma);
+                soma = 0;
             end
-            img1(i+1,j+1) = abs(soma);
         end
-        soma = 0;
     end
-end
+endfunction
 
+printf("MATRIZ ORIGINAL:\n");
+PrintMatrix(rows,columns,img);
+
+//detector
 printf("MATRIZ H1 NÃO-NORMALIZADA:\n");
-for i=1:x
-    for j=1:y
-        printf("[%d] ", img1(i,j));
-    end
-    printf("\n");
-end
+detector = Detector(3);
+PrintMatrix(rows,columns,detector);
 
-//MÁSCARA 3x3 GERADORA
-img2 = img;
-soma = 0;
-
-printf("\n");
-
-//cálculo da geração de mesma imagem
-for i=1:x
-    for j=1:y
-        if x-i >= 2 & y-j >= 2 then
-            for m=i:i+2
-                for n=j:j+2
-                    soma = soma + double(img(m,n))*(maskGeradora(m-i+1,n-j+1));
-                end
-            end
-            
-            img2(i+1,j+1) = abs(soma);
-        end
-        soma = 0;
-    end
-end
-
+//geradora
 printf("MATRIZ GERADORA DE MESMA IMAGEM:\n");
-for i=1:x
-    for j=1:y
-        printf("[%d] ", img2(i,j));
-    end
-    printf("\n");
-end
+geradora = MascaraGeradora(3);
+PrintMatrix(rows,columns,geradora);
 
 //Soma dos dois filtros
-img3 = img;
-
 printf("MATRIZ DE AGUÇAMENTO:\n");
-for i=1:x
-    for j=1:y
-        img3(i,j) = img1(i,j) + img2(i,j);
-        printf("[%d] ", img3(i,j));
-    end
-    printf("\n");
-end
-
-img3 = rgb2gray(img3);
+final = Agucamento();
+PrintMatrix(rows,columns,final);
 
 //Escritas de imagem em arquivo
-imshow(img3);
+figure; imshow(img);
+figure; imshow(detector);
+figure; imshow(geradora);
+figure; imshow(final);

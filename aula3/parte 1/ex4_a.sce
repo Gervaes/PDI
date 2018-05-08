@@ -1,107 +1,57 @@
 //lendo imagens e capturando dimensões
-img = imread("D:\github\PDI\aula3\teste.png");
-[x,y] = size(img);
+img = imread("C:\Users\Grrv\Desktop\PDI\aula3\parte 1\teste.png");
+img = rgb2gray(img);
+[rows,columns] = size(img);
 
-//acumulador da soma da janela
-soma = 0;
-
-printf("MATRIZ ORIGINAL:\n");
-for i=1:x
-    for j=1:y
-        printf("[%d] ", img(i,j));
+function []=PrintMatrix(rows,columns,image)
+    for i=1:rows
+        for j=1:columns
+            printf("[%d] ", image(i,j));
+        end
+        printf("\n");
     end
-    printf("\n");
-end
+endfunction
+
+function [image]=Smoothing(w)
+    soma = 0;
+    image = img;
+    
+    for i=1:rows
+        for j=1:columns
+            if rows-i >= w-1 & columns-j >= w-1 then
+                for m=i:i+w-1
+                    for n=j:j+w-1
+                        soma = double(soma + double(img(m,n)));
+                    end
+                end
+                media = round(soma/(w*w));
+                image(i+floor(w/2),j+floor(w/2)) = media;
+                soma = 0;
+            end
+        end
+    end
+endfunction
+
+//MATRIZ ORIGINAL
+printf("MATRIZ ORIGINAL:\n");
+PrintMatrix(rows,columns,img);
 
 //MÁSCARA 3x3
-img1 = img;
-
-printf("\n");
-
-//cálculo da média
-for i=1:x
-    for j=1:y
-        if x-i >= 2 & y-j >= 2 then
-            for m=i:i+2
-                for n=j:j+2
-                    soma = int32(soma + img1(m,n));
-                end
-            end
-            media = round(soma/9);
-            img1(i+1,j+1) = media;
-            soma = 0;
-        end
-    end
-end
-
+img3x3 = Smoothing(3);
 printf("MATRIZ COM MÁSCARA 3x3:\n");
-for i=1:x
-    for j=1:y
-        printf("[%d] ", img1(i,j));
-    end
-    printf("\n");
-end
-
-soma = 0;
+PrintMatrix(rows,columns,img3x3);
 
 //MÁSCARA 5x5
-img2 = img;
-
-printf("\n");
-
-//cálculo da média
-for i=1:x
-    for j=1:y
-        if x-i >= 4 & y-j >= 4 then
-            for m=i:i+4
-                for n=j:j+4
-                    soma = int32(soma + img2(m,n));
-                end
-            end
-            media = round(soma/25);
-            img2(i+2,j+2) = media;
-            soma = 0;
-        end
-    end
-end
-soma = 0;
-
+img5x5 = Smoothing(5);
 printf("MATRIZ COM MÁSCARA 5x5:\n");
-for i=1:x
-    for j=1:y
-        printf("[%d] ", img2(i,j));
-    end
-    printf("\n");
-end
+PrintMatrix(rows,columns,img5x5);
 
 //MÁSCARA 7x7
-img3 = img;
-
-printf("\n");
-
-//cálculo da média
-for i=1:x
-    for j=1:y
-        if x-i >= 6 & y-j >= 6 then
-            for m=i:i+6
-                for n=j:j+6
-                    soma = int32(soma + img3(m,n));
-                end
-            end
-            media = round(soma/49);
-            img3(i+3,j+3) = media;
-            soma = 0;
-        end
-    end
-end
-
+img7x7 = Smoothing(7);
 printf("MATRIZ COM MÁSCARA 7x7:\n");
-for i=1:x
-    for j=1:y
-        printf("[%d] ", img3(i,j));
-    end
-    printf("\n");
-end
+PrintMatrix(rows,columns,img7x7);
 
-//Escritas de imagem em arquivo
-imshow(img3);
+figure; imshow(img);
+figure; imshow(img3x3);
+figure; imshow(img5x5);
+figure; imshow(img7x7);

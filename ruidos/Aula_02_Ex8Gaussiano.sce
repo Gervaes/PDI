@@ -53,15 +53,15 @@ end
 
 for i=1:256
     for j=1:256
-        indice = double(asp(i,j)) + 1;
+        indice = double(ag(i,j)) + 1;
         ah(indice) = ah(indice) + 1;
-        indice = double(bsp(i,j)) + 1;
+        indice = double(bg(i,j)) + 1;
         bh(indice) = bh(indice) + 1;
-        indice = double(csp(i,j)) + 1;
+        indice = double(cg(i,j)) + 1;
         ch(indice) = ch(indice) + 1;
-        indice = double(dsp(i,j)) + 1;
+        indice = double(dg(i,j)) + 1;
         dh(indice) = dh(indice) + 1;
-        indice = double(esp(i,j)) + 1;
+        indice = double(eg(i,j)) + 1;
         eh(indice) = eh(indice) + 1;
     end
 end
