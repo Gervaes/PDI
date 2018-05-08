@@ -1,6 +1,6 @@
 //Leitura da imagem
 
-mammogram = imread('C:\Users\marco\OneDrive\Documentos\GitHub\PDI\artigo\mammogram.png');
+mammogram = imread('C:\Users\marco\OneDrive\Documentos\GitHub\PDI\artigo\mammogram2.png');
 mammogram = rgb2gray(mammogram);
 
 //image size
@@ -163,30 +163,43 @@ for k=1:rows
     mprintf('\n');
 end
 
-figure;
-imshow(mammogram);
+//figure;
+//imshow(mammogram);
 figure;
 imshow(B);
 
 //inicialização do processo de suavização de contorno usando morfologia matemática (operação fechamento: dilatação e depois erosão)
 
 //declaração de elemento estruturante (matriz 7x7 com origem no pixel central)
-EE = [255, 255, 255, 255, 255, 255, 255;
+/*EE = [255, 255, 255, 255, 255, 255, 255;
       255, 255, 255, 255, 255, 255, 255;
       255, 255, 255, 255, 255, 255, 255;
       255, 255, 255, 255, 255, 255, 255;
       255, 255, 255, 255, 255, 255, 255;
       255, 255, 255, 255, 255, 255, 255;
-      255, 255, 255, 255, 255, 255, 255;];
+      255, 255, 255, 255, 255, 255, 255];*/
+      
+x = rows+6;
+y = columns+6;
 
-image = B;
+for i=1:x
+    for j=1:y
+        imgExt(i,j) = 0;
+    end
+end
 
-for k=1:rows
-    for l=1:columns
-        if EE(4,4) == image(k,l) &  then
-            for m=(k-3):(k+3), o=1:7
-                for n=(l-3):(l+3), p=1:7
-                    image(m,n) = EE(o,p);
+for i=4:(x-3)
+    for j=4:(y-3)
+        imgExt(i,j) = B(i-3,j-3);
+    end
+end
+
+for k=4:(x-3)
+    for l=4:(y-3)
+        if imgExt(k,l) == 255 then
+            for m=(k-3):(k+3)
+                for n=(l-3):(l+3)
+                    imgExt2(m,n) = 255;
                 end
             end
         end
@@ -194,4 +207,4 @@ for k=1:rows
 end
 
 figure;
-imshow(image);
+imshow(imgExt2);
