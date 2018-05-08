@@ -171,19 +171,19 @@ imshow(B);
 //inicialização do processo de suavização de contorno usando morfologia matemática (operação fechamento: dilatação e depois erosão)
 
 //declaração de elemento estruturante (matriz 7x7 com origem no pixel central)
-EE = [1, 1, 1, 1, 1, 1, 1;
-      1, 1, 1, 1, 1, 1, 1;
-      1, 1, 1, 1, 1, 1, 1;
-      1, 1, 1, 1, 1, 1, 1;
-      1, 1, 1, 1, 1, 1, 1;
-      1, 1, 1, 1, 1, 1, 1;
-      1, 1, 1, 1, 1, 1, 1];
+EE = [255, 255, 255, 255, 255, 255, 255;
+      255, 255, 255, 255, 255, 255, 255;
+      255, 255, 255, 255, 255, 255, 255;
+      255, 255, 255, 255, 255, 255, 255;
+      255, 255, 255, 255, 255, 255, 255;
+      255, 255, 255, 255, 255, 255, 255;
+      255, 255, 255, 255, 255, 255, 255;];
 
 image = B;
 
 for k=1:rows
     for l=1:columns
-        if EE(4,4) == image(k,l) then
+        if EE(4,4) == image(k,l) &  then
             for m=(k-3):(k+3), o=1:7
                 for n=(l-3):(l+3), p=1:7
                     image(m,n) = EE(o,p);
