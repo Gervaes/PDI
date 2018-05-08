@@ -1,6 +1,6 @@
 //Leitura da imagem
 
-mammogram = imread('C:\Users\marco\OneDrive\Documentos\GitHub\PDI\artigo\mammogram2.png');
+mammogram = imread('C:\Users\marco\OneDrive\Documentos\GitHub\PDI\artigo\mamografia.jpg');
 mammogram = rgb2gray(mammogram);
 
 //image size
@@ -169,19 +169,11 @@ figure;
 imshow(B);
 
 //inicialização do processo de suavização de contorno usando morfologia matemática (operação fechamento: dilatação e depois erosão)
-
-//declaração de elemento estruturante (matriz 7x7 com origem no pixel central)
-/*EE = [255, 255, 255, 255, 255, 255, 255;
-      255, 255, 255, 255, 255, 255, 255;
-      255, 255, 255, 255, 255, 255, 255;
-      255, 255, 255, 255, 255, 255, 255;
-      255, 255, 255, 255, 255, 255, 255;
-      255, 255, 255, 255, 255, 255, 255;
-      255, 255, 255, 255, 255, 255, 255];*/
       
 x = rows+6;
 y = columns+6;
 
+//criação de matriz extendida com borda de 3px, para aplicar o elemento estruturante
 for i=1:x
     for j=1:y
         imgExt(i,j) = 0;
@@ -194,6 +186,7 @@ for i=4:(x-3)
     end
 end
 
+//se a origem do elemento estruturante pertencer ao objeto, realiza a união entre objeto e elemento (dilatação)
 for k=4:(x-3)
     for l=4:(y-3)
         if imgExt(k,l) == 255 then
@@ -208,3 +201,40 @@ end
 
 figure;
 imshow(imgExt2);
+
+count = 0;
+
+for k=4:(x-3)
+    for l=4:(y-3)
+        if imgExt(k,l) == 255 then
+            for m=(k-3):(k+3)
+                for n=(l-3):(l+3)
+                    if imgExt(m,n) == 255 then
+                        count = count + 1;
+                    end
+                end
+            end
+         end
+         if count == 49 then
+             for m=(k-3):(k+3)
+                for n=(l-3):(l+3)
+                    if imgExt(m,n) == imgExt(k,l) then
+                        imgExt3(m,n) = 255;
+                    else
+                        imgExt3(m,n) = 0;
+                    end
+                end
+            end
+        else
+            for m=(k-3):(k+3)
+                for n=(l-3):(l+3)
+                    imgExt3(m,n) = 0;
+                end
+            end
+        end
+        count = 0;
+    end
+end
+
+figure;
+imshow(imgExt3);
