@@ -1,6 +1,6 @@
 //Leitura da imagem
 
-mammogram = imread('C:\Users\marco\OneDrive\Documentos\GitHub\PDI\artigo\mamografia.jpg');
+mammogram = imread('D:\github\PDI\artigo\mammogram.png');
 mammogram = rgb2gray(mammogram);
 
 //image size
@@ -165,8 +165,8 @@ end
 
 //figure;
 //imshow(mammogram);
-figure;
-imshow(B);
+//figure;
+//imshow(B);
 
 //inicialização do processo de suavização de contorno usando morfologia matemática (operação fechamento: dilatação e depois erosão)
       
@@ -199,11 +199,12 @@ for k=4:(x-3)
     end
 end
 
-figure;
-imshow(imgExt2);
+//figure;
+//imshow(imgExt2);
 
 count = 0;
 
+//erosão
 for k=4:(x-3)
     for l=4:(y-3)
         if imgExt(k,l) == 255 then
@@ -236,5 +237,47 @@ for k=4:(x-3)
     end
 end
 
+//erosão
+for k=2:(x-1)
+    for l=2:(y-1)
+        if imgExt3(k,l) == 255 then
+            for m=(k-1):(k+1)
+                for n=(l-1):(l+1)
+                    if imgExt3(m,n) == 255 then
+                        count = count + 1;
+                    end
+                end
+            end
+         end
+         if count == 9 then
+             for m=(k-1):(k+1)
+                for n=(l-1):(l+1)
+                    if imgExt3(m,n) == imgExt3(k,l) then
+                        imgExt4(m,n) = 255;
+                    else
+                        imgExt4(m,n) = 0;
+                    end
+                end
+            end
+        else
+            for m=(k-1):(k+1)
+                for n=(l-1):(l+1)
+                    imgExt4(m,n) = 0;
+                end
+            end
+        end
+        count = 0;
+    end
+end
+
 figure;
-imshow(imgExt3);
+imshow(imgExt4);
+
+for i=1:rows
+    for j=1:columns
+        contorno(i,j) = imgExt3(i,j) - imgExt4(i,j);
+    end
+end
+
+figure;
+imshow(contorno);
