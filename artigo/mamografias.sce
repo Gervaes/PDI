@@ -1,6 +1,6 @@
 //Leitura da imagem
 
-mammogram = imread('D:\github\PDI\artigo\mammogram.png');
+mammogram = imread('C:\Users\marco\OneDrive\Documentos\GitHub\PDI\artigo\mammogram.png');
 mammogram = rgb2gray(mammogram);
 
 //image size
@@ -236,6 +236,9 @@ for k=4:(x-3)
         count = 0;
     end
 end
+
+figure;
+imshow(imgExt3);
 
 //erosão
 for k=2:(x-1)
