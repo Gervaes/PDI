@@ -165,8 +165,8 @@ end
 
 //figure;
 //imshow(mammogram);
-//figure;
-//imshow(B);
+figure;
+imshow(B);
 
 //inicialização do processo de suavização de contorno usando morfologia matemática (operação fechamento: dilatação e depois erosão)
       
@@ -187,6 +187,12 @@ for i=4:(x-3)
 end
 
 //se a origem do elemento estruturante pertencer ao objeto, realiza a união entre objeto e elemento (dilatação)
+for i=1:x
+    for j=1:y
+        imgExt2(i,j) = 0;
+    end
+end
+
 for k=4:(x-3)
     for l=4:(y-3)
         if imgExt(k,l) == 255 then
@@ -199,18 +205,18 @@ for k=4:(x-3)
     end
 end
 
-//figure;
-//imshow(imgExt2);
+figure;
+imshow(imgExt2);
 
 count = 0;
 
 //erosão
 for k=4:(x-3)
     for l=4:(y-3)
-        if imgExt(k,l) == 255 then
+        if imgExt2(k,l) == 255 then
             for m=(k-3):(k+3)
                 for n=(l-3):(l+3)
-                    if imgExt(m,n) == 255 then
+                    if imgExt2(m,n) == 255 then
                         count = count + 1;
                     end
                 end
@@ -219,7 +225,7 @@ for k=4:(x-3)
          if count == 49 then
              for m=(k-3):(k+3)
                 for n=(l-3):(l+3)
-                    if imgExt(m,n) == imgExt(k,l) then
+                    if imgExt2(m,n) == imgExt2(k,l) then
                         imgExt3(m,n) = 255;
                     else
                         imgExt3(m,n) = 0;
@@ -240,47 +246,70 @@ end
 figure;
 imshow(imgExt3);
 
-//erosão
-for k=2:(x-1)
-    for l=2:(y-1)
-        if imgExt3(k,l) == 255 then
-            for m=(k-1):(k+1)
-                for n=(l-1):(l+1)
-                    if imgExt3(m,n) == 255 then
-                        count = count + 1;
-                    end
-                end
-            end
-         end
-         if count == 9 then
-             for m=(k-1):(k+1)
-                for n=(l-1):(l+1)
-                    if imgExt3(m,n) == imgExt3(k,l) then
-                        imgExt4(m,n) = 255;
-                    else
-                        imgExt4(m,n) = 0;
-                    end
-                end
-            end
-        else
-            for m=(k-1):(k+1)
-                for n=(l-1):(l+1)
-                    imgExt4(m,n) = 0;
-                end
-            end
-        end
-        count = 0;
-    end
-end
-
-figure;
-imshow(imgExt4);
-
-for i=1:rows
-    for j=1:columns
-        contorno(i,j) = imgExt3(i,j) - imgExt4(i,j);
-    end
-end
-
-figure;
-imshow(contorno);
+//------------------------Processo de extração de borda---------------------------
+//for i=1:x
+//    for j=1:y
+//        imgExt4(i,j) = 0;
+//    end
+//end
+//
+//count = 0;
+//
+////processo por erosão (A-(A-B))
+////for k=2:(x-1)
+////    for l=2:(y-1)
+////        if imgExt3(k,l) == 255 then
+////            for m=(k-1):(k+1)
+////                for n=(l-1):(l+1)
+////                    if imgExt3(m,n) == 255 then
+////                        count = count + 1;
+////                    end
+////                end
+////            end
+////         end
+////         if count == 9 then
+////             for m=(k-1):(k+1)
+////                for n=(l-1):(l+1)
+////                    if imgExt3(m,n) == imgExt3(k,l) then
+////                        imgExt4(m,n) = 255;
+////                    else
+////                        imgExt4(m,n) = 0;
+////                    end
+////                end
+////            end
+////        else
+////            for m=(k-1):(k+1)
+////                for n=(l-1):(l+1)
+////                    imgExt4(m,n) = 0;
+////                end
+////            end
+////        end
+////        count = 0;
+////    end
+////end
+//
+////processo por dilatação ((A+B)-A)
+//for k=2:(x-1)
+//    for l=2:(y-1)
+//        if imgExt3(k,l) == 255 then
+//            for m=(k-1):(k+1)
+//                for n=(l-1):(l+1)
+//                    imgExt4(m,n) = 255;
+//                end
+//            end
+//        end
+//    end
+//end
+//
+//figure;
+//imshow(imgExt4);
+//
+//for i=1:x
+//    for j=1:y
+//        contorno(i,j) = imgExt4(i,j) - imgExt3(i,j);
+//    end
+//end
+//
+//figure;
+//imshow(contorno);
+//
