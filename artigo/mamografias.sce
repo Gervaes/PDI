@@ -1,6 +1,6 @@
 //Leitura da imagem
 
-mammogram = imread('C:\Users\marco\OneDrive\Documentos\GitHub\PDI\artigo\mammogram.png');
+mammogram = imread('C:\Users\Grrv\Desktop\PDI\artigo\mamografia.jpg');
 mammogram = rgb2gray(mammogram);
 
 //image size
@@ -205,6 +205,7 @@ for k=4:(x-3)
     end
 end
 
+//Dilatada
 figure;
 imshow(imgExt2);
 
@@ -243,73 +244,51 @@ for k=4:(x-3)
     end
 end
 
+//Erodida
 figure;
 imshow(imgExt3);
 
 //------------------------Processo de extração de borda---------------------------
-//for i=1:x
-//    for j=1:y
-//        imgExt4(i,j) = 0;
-//    end
-//end
-//
-//count = 0;
-//
-////processo por erosão (A-(A-B))
-////for k=2:(x-1)
-////    for l=2:(y-1)
-////        if imgExt3(k,l) == 255 then
-////            for m=(k-1):(k+1)
-////                for n=(l-1):(l+1)
-////                    if imgExt3(m,n) == 255 then
-////                        count = count + 1;
-////                    end
-////                end
-////            end
-////         end
-////         if count == 9 then
-////             for m=(k-1):(k+1)
-////                for n=(l-1):(l+1)
-////                    if imgExt3(m,n) == imgExt3(k,l) then
-////                        imgExt4(m,n) = 255;
-////                    else
-////                        imgExt4(m,n) = 0;
-////                    end
-////                end
-////            end
-////        else
-////            for m=(k-1):(k+1)
-////                for n=(l-1):(l+1)
-////                    imgExt4(m,n) = 0;
-////                end
-////            end
-////        end
-////        count = 0;
-////    end
-////end
-//
-////processo por dilatação ((A+B)-A)
-//for k=2:(x-1)
-//    for l=2:(y-1)
-//        if imgExt3(k,l) == 255 then
-//            for m=(k-1):(k+1)
-//                for n=(l-1):(l+1)
-//                    imgExt4(m,n) = 255;
-//                end
-//            end
-//        end
-//    end
-//end
-//
-//figure;
-//imshow(imgExt4);
-//
-//for i=1:x
-//    for j=1:y
-//        contorno(i,j) = imgExt4(i,j) - imgExt3(i,j);
-//    end
-//end
-//
-//figure;
-//imshow(contorno);
-//
+for i=1:x
+    for j=1:y
+        imgExt4(i,j) = 0;
+    end
+end
+
+count = 0;
+
+//processo por dilatação ((A+B)-A)
+for k=2:(x-1)
+    for l=2:(y-1)
+        if imgExt3(k,l) == 255 then
+            for m=(k-1):(k+1)
+                for n=(l-1):(l+1)
+                    imgExt4(m,n) = 255;
+                end
+            end
+        end
+    end
+end
+
+figure;
+imshow(imgExt4);
+
+for i=1:x
+    for j=1:y
+        contorno(i,j) = imgExt4(i,j) - imgExt3(i,j);
+    end
+end
+
+figure;
+imshow(contorno);
+
+for i=4:(x-3)
+    for j=4:(y-3)
+        if contorno(i,j) == 255 then
+            mammogram(i-3,j-3) = 255;
+        end
+    end
+end
+
+figure;
+imshow(mammogram);
