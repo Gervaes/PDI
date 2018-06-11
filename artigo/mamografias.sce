@@ -1,6 +1,6 @@
 //Leitura da imagem
 
-mammogram = imread('C:\Users\Grrv\Desktop\PDI\artigo\mamografia.jpg');
+mammogram = imread('D:\github\PDI\artigo\mammogram.png');
 mammogram = rgb2gray(mammogram);
 
 //image size
@@ -282,13 +282,45 @@ end
 figure;
 imshow(contorno);
 
-for i=4:(x-3)
-    for j=4:(y-3)
+//cálculo de DFT
+count = 0;
+
+printf("\nVetor de DFT: ");
+
+//recebe cada ponto com valor 1 em um vetor, para calcular os coeficientes
+for i=1:x
+    for j=1:y
         if contorno(i,j) == 255 then
-            mammogram(i-3,j-3) = 255;
+            dftVec(i,j) = contorno(i,j);
         end
     end
 end
 
-figure;
-imshow(mammogram);
+//cálculo de DFT
+dftVec = fft(dftVec);
+
+[x,y] = size(dftVec);
+
+for i=1:x
+    for j=1:y
+        printf("%f ", dftVec(i,j));
+    end
+end
+
+//for i=1:count
+//    nComplex(i) = 0;
+//end
+//
+//count = 0;
+//
+////calculando vetor de números complexos
+//for i=1:x
+//    for k=1:y
+//        if contorno(i,j) == 255 then
+//            nComplex(count) = complex(i,j);
+//            count = count + 1;
+//        end
+//    end
+//end
+//
+//dftVec = fft(contorno);
