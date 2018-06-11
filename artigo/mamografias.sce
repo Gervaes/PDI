@@ -165,8 +165,8 @@ end
 
 //figure;
 //imshow(mammogram);
-figure;
-imshow(B);
+//figure;
+//imshow(B);
 
 //inicialização do processo de suavização de contorno usando morfologia matemática (operação fechamento: dilatação e depois erosão)
       
@@ -206,8 +206,8 @@ for k=4:(x-3)
 end
 
 //Dilatada
-figure;
-imshow(imgExt2);
+//figure;
+//imshow(imgExt2);
 
 count = 0;
 
@@ -245,8 +245,8 @@ for k=4:(x-3)
 end
 
 //Erodida
-figure;
-imshow(imgExt3);
+//figure;
+//imshow(imgExt3);
 
 //------------------------Processo de extração de borda---------------------------
 for i=1:x
@@ -270,8 +270,8 @@ for k=2:(x-1)
     end
 end
 
-figure;
-imshow(imgExt4);
+//figure;
+//imshow(imgExt4);
 
 for i=1:x
     for j=1:y
@@ -283,29 +283,25 @@ figure;
 imshow(contorno);
 
 //cálculo de DFT
-count = 0;
+count = 1;
 
 printf("\nVetor de DFT: ");
 
-//recebe cada ponto com valor 1 em um vetor, para calcular os coeficientes
+//calcula os coeficientes para toda a matriz
+dftVec = fft(contorno);
+
+//cada ponto com valor 1 recebe seu valor correspondente em um vetor
 for i=1:x
     for j=1:y
         if contorno(i,j) == 255 then
-            dftVec(i,j) = contorno(i,j);
+            v(count) = dftVec(i,j);
+            printf("%d ", v(count));
+            count = count + 1;
         end
     end
 end
 
-//cálculo de DFT
-dftVec = fft(dftVec);
-
-[x,y] = size(dftVec);
-
-for i=1:x
-    for j=1:y
-        printf("%f ", dftVec(i,j));
-    end
-end
+plot(v);
 
 //for i=1:count
 //    nComplex(i) = 0;
