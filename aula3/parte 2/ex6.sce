@@ -1,10 +1,7 @@
 //Gerar e apresentar histogramas, normais e equalizados
 
 //leitura das imagens
-a = imread('C:\Users\Grrv\Desktop\PDI\aula3\parte 1\1.bmp');
-b = imread('C:\Users\Grrv\Desktop\PDI\aula3\parte 2\2.bmp');
-c = imread('C:\Users\Grrv\Desktop\PDI\aula3\parte 2\3.tif');
-d = imread('C:\Users\Grrv\Desktop\PDI\aula3\parte 2\4.bmp');
+a = imread('C:\Users\marco\OneDrive\Documentos\GitHub\PDI\aula3\parte 2\1.bmp');
 
 //captura de dimensões da img
 [rows,columns] = size(a);
