@@ -58,12 +58,12 @@ function [HSI]=ConversaoHSI(imagem)
                 //Normalizando H de 0 a 1
                 HSI(i,j,1) = HSI(i,j,1)/360;
 
-            //Saturação S
+            //Saturação (S)
                 numerador = (min(R(i,j), G(i,j), B(i,j)))*3;
                 denominador = R(i,j) + G(i,j) + B(i,j);
                 HSI(i,j,2) = 1 - (numerador/(denominador + 0.000001));  
                 
-            //Intesidade I
+            //Intesidade (I)
                 HSI(i,j,3) = denominador/3;
         end
     end
@@ -228,28 +228,29 @@ classeB = ["ytma49_072303_malignant2_ccd.TIF",
 //Vetores de características
 caracteristicas = zeros(14,3);
 imagem = imread(classeA(1));
+figure; imshow(imagem);
 
 //Etapa 0 - Conversão para HSI
 HSI = zeros(size(imagem));
 HSI = ConversaoHSI(imagem);
-figure; imshow(HSI(:,:,3));
+figure; imshow(HSI);
 
-//Etapa 1 - Equalização do canal I
+////Etapa 1 - Equalização do canal I
 I = EqualizacaoI(HSI);
 figure; imshow(I);
-
-//Etapa 2 - Segmentação da imagem do canal I
-[imagem_seg_1,imagem_seg_2] = Segmentacao(I);
-
-figure; imshow(imagem_seg_1);
-figure; imshow(imagem_seg_2);
-
-//Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
-imagem_seg_1 = FiltroMorfologico(imagem_seg_1);
-imagem_seg_2 = FiltroMorfologico(imagem_seg_2);
-
-figure; imshow(imagem_seg_1);
-figure; imshow(imagem_seg_2);
-
-//Etapa 4 - Compor vetor de características (Entropia, Dimensão Fractal e )
-//[ent,df,opmf] = ConstruirVetor(imagem_seg_1,imagem_seg_2,I);
+//
+////Etapa 2 - Segmentação da imagem do canal I
+//[imagem_seg_1,imagem_seg_2] = Segmentacao(I);
+//
+//figure; imshow(imagem_seg_1);
+//figure; imshow(imagem_seg_2);
+//
+////Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
+//imagem_seg_1 = FiltroMorfologico(imagem_seg_1);
+//imagem_seg_2 = FiltroMorfologico(imagem_seg_2);
+//
+//figure; imshow(imagem_seg_1);
+//figure; imshow(imagem_seg_2);
+//
+////Etapa 4 - Compor vetor de características (Entropia, Dimensão Fractal e )
+////[ent,df,opmf] = ConstruirVetor(imagem_seg_1,imagem_seg_2,I);
