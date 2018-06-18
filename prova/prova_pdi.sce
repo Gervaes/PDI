@@ -204,8 +204,101 @@ function [ent,df,opmf]=ConstruirVetor(imagem_seg_1,imagem_seg_2,I)
         //
 endfunction
 
-function [imagem_seg]=FiltroMorfologico(imagem_seg)
-    /*MARCOS, INSERIR SEU CONHECIMENTO AQUI*/
+function [imgDilatada]=Dilatacao(img, corObj, corFun, x, y, elemEs, inicio, fim)
+    for i=1:x
+        for j=1:y
+            imgDilatada(i,j) = corFun;
+        end
+    end
+    
+    for k=inicio:(x-fim)
+        for l=inicio:(y-fim)
+            if img(k,l) == corObj then
+                for m=(k-elemEs):(k+elemEs)
+                    for n=(l-elemEs):(l+elemEs)
+                        imgDilatada(m,n) = corObj;
+                    end
+                end
+            end
+        end
+    end
+    
+    figure; imshow(imgDilatada);
+endfunction
+
+function [imgErodida]=Erosao(img, corObj, corFun, x, y, elemEs, inicio, fim)
+    for i=1:x
+        for j=1:y
+            imgErodida(i,j) = corFun;
+        end
+    end
+    
+    count = 0;
+
+    for k=inicio:(x-fim)
+        for l=inicio:(y-fim)
+            if img(k,l) == corObj then
+                for m=(k-elemEs):(k+elemEs)
+                    for n=(l-elemEs):(l+elemEs)
+                        if img(m,n) == corObj then
+                            count = count + 1;
+                        end
+                    end
+                end
+             end
+             if count == 49 then
+                 for m=(k-elemEs):(k+elemEs)
+                    for n=(l-elemEs):(l+elemEs)
+                        if img(m,n) == img(k,l) then
+                            imgErodida(m,n) = corObj;
+                        else
+                            imgErodida(m,n) = corFun;
+                        end
+                    end
+                end
+            else
+                for m=(k-elemEs):(k+elemEs)
+                    for n=(l-elemEs):(l+elemEs)
+                        imgErodida(m,n) = corFun;
+                    end
+                end
+            end
+            count = 0;
+        end
+    end
+    
+    figure; imshow(imgErodida);
+endfunction
+
+function [imagem_seg]=FiltroMorfologico(imagem_seg, corObj, corFun)
+    [linhas,colunas] = size(imagem_seg);
+    
+    x = linhas + 6;     //dimensões da matriz extendida
+    y = colunas + 6;    //dimensões da matriz extendida
+    elemEs = 3;         //distância entre ponto central e borda do elemento estruturante
+    inicio = 4;         //inicío das informações da matriz extendida
+    fim = 3;            //fim das informações da matriz extendida
+    
+    //Criando matriz extendida para aplicar elemento estruturante
+    for i=1:x
+        for j=1:y
+            imgExt(i,j) = corFun;
+        end
+    end
+    
+    for i=inicio:(x-fim)
+        for j=inicio:(y-fim)
+            imgExt(i,j) = imagem_seg(i-elemEs,j-elemEs);
+        end
+    end
+    
+    imgErodida = Erosao(imgExt,0,1,x,y,elemEs,inicio,fim);
+    
+    imgDilatada = Dilatacao(imgErodida,0,1,x,y,elemEs,inicio,fim);
+    
+    imgDilatada = Dilatacao(imgDilatada,0,1,x,y,elemEs,inicio,fim);
+    
+    imgErodida = Erosao(imgDilatada,0,1,x,y,elemEs,inicio,fim);
 endfunction
 
 //Classes de imagens
@@ -227,29 +320,27 @@ classeB = ["ytma49_072303_malignant2_ccd.TIF",
 
 //Vetores de características
 caracteristicas = zeros(14,3);
-imagem = imread(classeA(1));
-figure; imshow(imagem);
+imagem = imread("C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\ytma49_072303_benign2_ccd.TIF");
+//figure; imshow(imagem);
 
 //Etapa 0 - Conversão para HSI
 HSI = zeros(size(imagem));
 HSI = ConversaoHSI(imagem);
-figure; imshow(HSI);
+//figure; imshow(HSI(:,:,3));
 
 ////Etapa 1 - Equalização do canal I
 I = EqualizacaoI(HSI);
-figure; imshow(I);
 //
 ////Etapa 2 - Segmentação da imagem do canal I
-//[imagem_seg_1,imagem_seg_2] = Segmentacao(I);
+[imagem_seg_1,imagem_seg_2] = Segmentacao(I);
 //
-//figure; imshow(imagem_seg_1);
+figure; imshow(imagem_seg_1);
 //figure; imshow(imagem_seg_2);
 //
 ////Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
-//imagem_seg_1 = FiltroMorfologico(imagem_seg_1);
-//imagem_seg_2 = FiltroMorfologico(imagem_seg_2);
-//
+imagem_seg_1 = FiltroMorfologico(imagem_seg_1, 1, 0);
 //figure; imshow(imagem_seg_1);
+//imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
 //figure; imshow(imagem_seg_2);
 //
 ////Etapa 4 - Compor vetor de características (Entropia, Dimensão Fractal e )
