@@ -1,103 +1,255 @@
-imgInput = imread("teste.png");
+function [H]=Entropia(I,L,x,y)
+    //Zerando vetor histograma
+    for k=1: 256
+        qtdL(k) = 0;
+    end
+    
+    //Preenchendo vetor histograma
+    for i=(((x-1)*L)+1):x*L
+        for j=(((y-1)*L)+1):y*L
+            qtdL(I(i,j)+1) = qtdL(I(i,j)+1) + 1;
+        end
+    end
+    
+    //Preenchendo vetor Pi
+    for k=1: 256
+        Pi(k) = double(qtdL(k) / (L*L));
+    end
+    
+    H=0;
+    //Entropia
+    for k=1: 256
+        if Pi(k) <> 0 then
+            H = H + (Pi(k)*log2(Pi(k)));
+        end
+    end
+    
+    //Multiplicando entropia por -1
+    H = H*(-1);
+endfunction
 
-//--------------------------------------------- Conversão RGB >> HSI ---------------------------------------------
+function [HSI]=ConversaoHSI(imagem)
+    [linhas,colunas] = size(imagem);
+    
+    //normalizando valores entre 0 e 1
+    RGB = double(imagem)/255;
+    
+    //Separando canais da imagem RGB
+    R = RGB(:,:,1);
+    G = RGB(:,:,2);
+    B = RGB(:,:,3);
+    
+    //Conversão para HSI
+    for i=1:linhas
+        for j=1:colunas
+            //Matiz (H)
+                //Calculando theta
+                numerador = 0.5*(R(i,j) - G(i,j) + (R(i,j) - B(i,j)));
+                denominador = sqrt((R(i,j) - G(i,j))^2 + (R(i,j) - B(i,j))*(G(i,j) - B(i,j)));
+                theta = acos(numerador/(denominador + 0.000001)); //adiçãopra evitar divisão por 0
+            
+                //Calculando matiz (H)
+                if B(i,j) <= G(i,j) then
+                    HSI(i,j,1) = theta;
+                else
+                    HSI(i,j,1) = 360 - theta;
+                end
+    
+                //Normalizando H de 0 a 1
+                HSI(i,j,1) = HSI(i,j,1)/360;
 
-//normalizando imagem entre 0~1
-rgb = double(imgInput)/255;
+            //Saturação S
+                numerador = (min(R(i,j), G(i,j), B(i,j)))*3;
+                denominador = R(i,j) + G(i,j) + B(i,j);
+                HSI(i,j,2) = 1 - (numerador/(denominador + 0.000001));  
+                
+            //Intesidade I
+                HSI(i,j,3) = denominador/3;
+        end
+    end
+endfunction
 
-//captura das dimensões da imagem
-[x,y] = size(imgInput);
+function [I]=EqualizacaoI(HSI)
+    [linhas,colunas] = size(HSI);
+    total = double(linhas*colunas);
+    maior = 0;
+    escala = 256;
+    
+    for i=1:linhas
+        for j=1:colunas
+            HSI(i,j,3) = round(double(HSI(i,j,3)*255));
+        end
+    end
+    
+   //Zerando vetores probabilidade e histograma
+    for i=1:escala
+        probabilidade(i) = double(0);
+        histograma(i) = double(0);
+    end
 
-//dividindo os canais
-r = rgb(:, :, 1); //matriz r
-g = rgb(:, :, 2); //matriz g
-b = rgb(:, :, 3); //matriz b
+    //Preenchendo vetor histograma
+    for i=1:linhas
+        for j=1:colunas
+            indice = double(HSI(i,j,3)+1);
+            histograma(indice) = histograma(indice) + 1;
+            
+            if HSI(i,j,3) > maior then
+                maior = HSI(i,j,3);
+            end
+        end
+    end
+    
+    //Preenchendo vetor probabilidade
+    for i=1:escala
+        probabilidade(i) = double(histograma(i)/total);
+    end
+    
+    //Calculo da FDA
+    FDA(1) = probabilidade(1);
+    for i=2:escala
+        FDA(i) = double(double(FDA(i-1))+double(probabilidade(i)));
+    end
+    
+    //Aproximação dos níveis
+    for i=1:escala
+        equalizado(i) = round(double(double(FDA(i))*double(maior)));
+    end
+    
+    //Normalizando canal I
+    for i=1:linhas
+        for j=1:colunas
+            HSI(i,j,3) = double(equalizado(HSI(i,j,3)+1));
+        end
+    end
+    
+    //Zerando vetores probabilidade e histograma
+    for i=1:escala
+        probabilidade(i) = double(0);
+        histograma(i) = double(0);
+    end
 
-//cálculo das matrizes H, S e I
-for i=1:x
-    for j=1:y
-        //cálculo de theta (padrão)
-        n = 0.5*(r(i,j) - g(i,j) + (r(i,j) - b(i,j)));
-        d = sqrt((r(i,j) - g(i,j))^2 + (r(i,j) - b(i,j))*(g(i,j) - b(i,j)));
-        theta = acos(n/(d + 0.000001)); //essa adição é feita para evitar divisão por 0
-        
-        //cálculo de H (matiz)
-        //H = theta se b <= g
-        //H = 360 - theta se b > g
-        if b(i,j) <= g(i,j) then
-            H(i,j) = theta;
+    //Retornando canal I equalizado
+    I = HSI(:,:,3)/255;
+endfunction
+
+function [imagem_seg_1,imagem_seg_2]=Segmentacao(I)
+    limiar = imgraythresh(I);
+    
+    [linhas,colunas] = size(I);
+    
+    //imagem_seg_1 = zeros(size(I)); //Imagem abaixo/igual do limiar
+    //imagem_seg_2 = zeros(size(I)); //Imagem acima do limiar
+    
+    for i=1:linhas
+        for j=1:colunas
+            if I(i,j) <= limiar
+                imagem_seg_1(i,j) = 1;
+            else
+                imagem_seg_2(i,j) = 1;
+            end
+        end
+    end
+endfunction
+
+function [ent,df,opmf]=ConstruirVetor(imagem_seg_1,imagem_seg_2,I)
+    [linhas,colunas] = size(I);
+    
+    ent = 0;
+    df = 0;
+    opmf = 0;
+    
+    //Entropia (feita com I)
+        //Escolhendo L máximo
+        if linhas > colunas then
+            L = colunas;
         else
-            H(i,j) = 360 - theta;
+            L = linhas;
         end
         
-        //normalizando entre 0~1
-        H(i,j) = H(i,j)/360;
+        //Calculando entropias para cada valor de L
+        cont = 0; 
+        while L > 1
+            H = 0;
+            
+            x = floor(linhas/L);
+            y = floor(colunas/L);
+            for i=1:x
+                for j=1:y
+                    H = H + Entropia(I,L,i,j);
+                end
+            end
+            
+            H = (H/(x*y));
         
-        //cálculo de S (saturação)
-        //S = 1 - ((3 / (r + g + b)) * min(r,g,b))
-        n = (min(r(i,j), g(i,j), b(i,j))) * 3;
-        d = r(i,j) + g(i,j) + b(i,j);
-        S(i,j) = 1 - (n/(d + 0.000001));
+            cont = cont + 1;
+            
+            entropias(cont,1) = L;
+            entropias(cont,2) = H;
         
-        //cálculo de I (intensidade)
-        //I = 1/3 * (r + g + b)
-        I(i,j) = d/3;
-    end
-end
-
-//concatenação de canais
-hsi = cat(3, H, S, I);
-
-//figure;
-//imshow(hsi);
-
-//--------------------------------------------- Equalização de canal I ---------------------------------------------
-
-//cálculo do número de pixels da img
-t = double(x*y);
-
-//definição inicial do maior valor como 0
-maior = 0;
-
-//constante de escala de cinza
-scale = 256;
-
-//zerando vetores histograma e probabilidade
-for i=1:scale
-    prob(i) = double(0);
-end
-
-for i=1:scale
-    hist(i) = double(0);
-end
-
-//1a etapa = calculando histograma (e maior nivel) e probabilidade
-for i=1:x
-    for j=1:y
-        index = double(double(I(i,j)) + 1);
-        hist(index) = double(hist(index) + 1);
-        if I(i,j) > maior then
-            maior = I(i,j);
+            L = floor(L/2);
         end
-    end
-end
+        
+        //Visualizando entropias
+        figure, plot(entropias(:,1),entropias(:,2));
+        
+        for i=1:cont
+            mprintf("\nL: %i, H: %f",entropias(cont,1),entropias(cont,2));
+            entropias(cont,1) = log10(entropias(cont,1));
+            entropias(cont,2) = log10(entropias(cont,2));
+        end
+        
+        //Visualizando entropias após regressão
+        figure; plot(entropias(:,1),entropias(:,2));
 
-//2a etapa = cálculo de FDA
-mprintf("\nFDA\n");
-for i=1:scale
-    if i > 1 then
-        FDA(i) = double(FDA(i-1) + double(prob(i)));
-    else
-        FDA(i) = double(prob(i));
-    end
-end
+        //
+endfunction
 
-//aproximação de níveis (3ª etapa)
-for i=1:scale
-    equal(i) = round(double(double(FDA(i))*double(maior)));
-end
+function [imagem_seg]=FiltroMorfologico(imagem_seg)
+    /*MARCOS, INSERIR SEU CONHECIMENTO AQUI*/
+endfunction
 
-//exibindo histogramas
-figure; bar(hist);
-figure; bar(equal);
+//Classes de imagens
+classeA = ["ytma49_072303_benign2_ccd.TIF",
+           "ytma49_111003_benign1_ccd.TIF",
+           "ytma49_111003_benign2_ccd.TIF",
+           "ytma49_111003_benign3_ccd.TIF",
+           "ytma49_111303_benign1_ccd.TIF",
+           "ytma49_111303_benign2_ccd.TIF",
+           "ytma49_111303_benign3_ccd.TIF"];
 
+classeB = ["ytma49_072303_malignant2_ccd.TIF",
+           "ytma49_111003_malignant1_ccd.TIF",
+           "ytma49_111003_malignant2_ccd.TIF",
+           "ytma49_111003_malignant3_ccd.TIF",
+           "ytma49_111303_malignant1_ccd.TIF",
+           "ytma49_111303_malignant2_ccd.TIF",
+           "ytma49_111303_malignant3_ccd.TIF"];
+
+//Vetores de características
+caracteristicas = zeros(14,3);
+imagem = imread(classeA(1));
+
+//Etapa 0 - Conversão para HSI
+HSI = zeros(size(imagem));
+HSI = ConversaoHSI(imagem);
+figure; imshow(HSI(:,:,3));
+
+//Etapa 1 - Equalização do canal I
+I = EqualizacaoI(HSI);
+figure; imshow(I);
+
+//Etapa 2 - Segmentação da imagem do canal I
+[imagem_seg_1,imagem_seg_2] = Segmentacao(I);
+
+figure; imshow(imagem_seg_1);
+figure; imshow(imagem_seg_2);
+
+//Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
+imagem_seg_1 = FiltroMorfologico(imagem_seg_1);
+imagem_seg_2 = FiltroMorfologico(imagem_seg_2);
+
+figure; imshow(imagem_seg_1);
+figure; imshow(imagem_seg_2);
+
+//Etapa 4 - Compor vetor de características (Entropia, Dimensão Fractal e )
+//[ent,df,opmf] = ConstruirVetor(imagem_seg_1,imagem_seg_2,I);
