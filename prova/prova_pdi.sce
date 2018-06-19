@@ -292,13 +292,15 @@ function [imagem_seg]=FiltroMorfologico(imagem_seg, corObj, corFun)
         end
     end
     
-    imgErodida = Erosao(imgExt,1,0,x,y,elemEs,inicio,fim);
+    imgErodida = Erosao(imgExt,corObj,corFun,x,y,elemEs,inicio,fim);
     
-    imgDilatada = Dilatacao(imgErodida,1,0,x,y,elemEs,inicio,fim);
+    imgDilatada = Dilatacao(imgErodida,corObj,corFun,x,y,elemEs,inicio,fim);
     
-    imgDilatada = Dilatacao(imgDilatada,1,0,x,y,elemEs,inicio,fim);
+    imgDilatada = Dilatacao(imgDilatada,corObj,corFun,x,y,elemEs,inicio,fim);
     
-    imgErodida = Erosao(imgDilatada,1,0,x,y,elemEs,inicio,fim);
+    imgErodida = Erosao(imgDilatada,corObj,corFun,x,y,elemEs,inicio,fim);
+    
+    figure; imshow(imgErodida);
 endfunction
 
 function OperadorMorfologico(imagem_seg, corObj)
@@ -341,16 +343,17 @@ imagem = imread("C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\ytma49_0723
 //Etapa 0 - Conversão para HSI
 HSI = zeros(size(imagem));
 HSI = ConversaoHSI(imagem);
-//figure; imshow(HSI(:,:,3));
+figure; imshow(HSI(:,:,3));
 
 ////Etapa 1 - Equalização do canal I
 I = EqualizacaoI(HSI);
+figure; imshow(I);
 //
 ////Etapa 2 - Segmentação da imagem do canal I
 [imagem_seg_1,imagem_seg_2] = Segmentacao(I);
 //
 figure; imshow(imagem_seg_1);
-//figure; imshow(imagem_seg_2);
+figure; imshow(imagem_seg_2);
 //
 ////Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
 imagem_seg_1 = FiltroMorfologico(imagem_seg_1, 1, 0);
