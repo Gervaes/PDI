@@ -356,7 +356,7 @@ figure; imshow(imagem_seg_1);
 figure; imshow(imagem_seg_2);
 //
 ////Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
-imagem_seg_1 = FiltroMorfologico(imagem_seg_1, 1, 0);
+imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
 //figure; imshow(imagem_seg_1);
 //imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
 //figure; imshow(imagem_seg_2);
