@@ -292,13 +292,28 @@ function [imagem_seg]=FiltroMorfologico(imagem_seg, corObj, corFun)
         end
     end
     
-    imgErodida = Erosao(imgExt,0,1,x,y,elemEs,inicio,fim);
+    imgErodida = Erosao(imgExt,1,0,x,y,elemEs,inicio,fim);
     
-    imgDilatada = Dilatacao(imgErodida,0,1,x,y,elemEs,inicio,fim);
+    imgDilatada = Dilatacao(imgErodida,1,0,x,y,elemEs,inicio,fim);
     
-    imgDilatada = Dilatacao(imgDilatada,0,1,x,y,elemEs,inicio,fim);
+    imgDilatada = Dilatacao(imgDilatada,1,0,x,y,elemEs,inicio,fim);
     
-    imgErodida = Erosao(imgDilatada,0,1,x,y,elemEs,inicio,fim);
+    imgErodida = Erosao(imgDilatada,1,0,x,y,elemEs,inicio,fim);
+endfunction
+
+function OperadorMorfologico(imagem_seg, corObj)
+    [linhas,colunas] = size(imagem_seg);
+    cont = 0;
+    
+    for i=1:linhas
+        for j=1:colunas
+            if imagem_seg(i,j) == corObj then
+                count = cont + 1;
+            end
+        end
+    end
+    
+    prob = round(cont/(linhas*colunas));
 endfunction
 
 //Classes de imagens
@@ -342,6 +357,9 @@ imagem_seg_1 = FiltroMorfologico(imagem_seg_1, 1, 0);
 //figure; imshow(imagem_seg_1);
 //imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
 //figure; imshow(imagem_seg_2);
+
+//Etapa 4 - Aplicação de quantificadores Entropia, DF e Operador Morfológico
+//OperadorMorfologico(imagem_seg_1,1);
 //
 ////Etapa 4 - Compor vetor de características (Entropia, Dimensão Fractal e )
 ////[ent,df,opmf] = ConstruirVetor(imagem_seg_1,imagem_seg_2,I);
