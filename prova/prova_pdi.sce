@@ -133,7 +133,7 @@ function [I]=EqualizacaoI(HSI)
 endfunction
 
 function [imagem_seg_1,imagem_seg_2]=Segmentacao(I)
-    limiar = 0.2;
+    limiar = 0.1;
     
     [linhas,colunas] = size(I);
     
@@ -291,12 +291,12 @@ function [imagem_seg]=FiltroMorfologico(imagem_seg, corObj, corFun)
             imgExt(i,j) = imagem_seg(i-elemEs,j-elemEs);
         end
     end
+    imgErodida = Erosao(imgExt,corObj,corFun,x,y,elemEs,inicio,fim);
+    imgDilatada = Dilatacao(imgErodida,corObj,corFun,x,y,elemEs,inicio,fim);
     
-    imgDilatada = Dilatacao(imgExt,corObj,corFun,x,y,elemEs,inicio,fim);
+//    imgErodida = Erosao(imgDilatada,corObj,corFun,x,y,elemEs,inicio,fim);
     
-    imgErodida = Erosao(imgDilatada,corObj,corFun,x,y,elemEs,inicio,fim);
-    
-    imgErodida = Erosao(imgErodida,corObj,corFun,x,y,elemEs,inicio,fim);
+//    imgErodida = Erosao(imgErodida,corObj,corFun,x,y,elemEs,inicio,fim);
     
     //figure; imshow(imgErodida);
 endfunction
