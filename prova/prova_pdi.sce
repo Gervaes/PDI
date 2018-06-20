@@ -133,7 +133,7 @@ function [I]=EqualizacaoI(HSI)
 endfunction
 
 function [imagem_seg_1,imagem_seg_2]=Segmentacao(I)
-    limiar = imgraythresh(I);
+    limiar = 0.2;
     
     [linhas,colunas] = size(I);
     
@@ -246,7 +246,7 @@ function [imgErodida]=Erosao(img, corObj, corFun, x, y, elemEs, inicio, fim)
                     end
                 end
              end
-             if count == 49 then
+             if count == 9 then
                  for m=(k-elemEs):(k+elemEs)
                     for n=(l-elemEs):(l+elemEs)
                         if img(m,n) == img(k,l) then
@@ -273,11 +273,11 @@ endfunction
 function [imagem_seg]=FiltroMorfologico(imagem_seg, corObj, corFun)
     [linhas,colunas] = size(imagem_seg);
     
-    x = linhas + 6;     //dimensões da matriz extendida
-    y = colunas + 6;    //dimensões da matriz extendida
-    elemEs = 3;         //distância entre ponto central e borda do elemento estruturante
-    inicio = 4;         //inicío das informações da matriz extendida
-    fim = 3;            //fim das informações da matriz extendida
+    x = linhas + 2;     //dimensões da matriz extendida
+    y = colunas + 2;    //dimensões da matriz extendida
+    elemEs = 1;         //distância entre ponto central e borda do elemento estruturante
+    inicio = 2;         //inicío das informações da matriz extendida
+    fim = 1;            //fim das informações da matriz extendida
     
     //Criando matriz extendida para aplicar elemento estruturante
     for i=1:x
@@ -292,15 +292,13 @@ function [imagem_seg]=FiltroMorfologico(imagem_seg, corObj, corFun)
         end
     end
     
-    imgErodida = Erosao(imgExt,corObj,corFun,x,y,elemEs,inicio,fim);
-    
-    imgDilatada = Dilatacao(imgErodida,corObj,corFun,x,y,elemEs,inicio,fim);
-    
-    imgDilatada = Dilatacao(imgDilatada,corObj,corFun,x,y,elemEs,inicio,fim);
+    imgDilatada = Dilatacao(imgExt,corObj,corFun,x,y,elemEs,inicio,fim);
     
     imgErodida = Erosao(imgDilatada,corObj,corFun,x,y,elemEs,inicio,fim);
     
-    figure; imshow(imgErodida);
+    imgErodida = Erosao(imgErodida,corObj,corFun,x,y,elemEs,inicio,fim);
+    
+    //figure; imshow(imgErodida);
 endfunction
 
 function OperadorMorfologico(imagem_seg, corObj)
@@ -343,22 +341,22 @@ imagem = imread("C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\ytma49_0723
 //Etapa 0 - Conversão para HSI
 HSI = zeros(size(imagem));
 HSI = ConversaoHSI(imagem);
-figure; imshow(HSI(:,:,3));
+//figure; imshow(HSI(:,:,3));
 
 ////Etapa 1 - Equalização do canal I
 I = EqualizacaoI(HSI);
-figure; imshow(I);
+//figure; imshow(I);
 //
 ////Etapa 2 - Segmentação da imagem do canal I
 [imagem_seg_1,imagem_seg_2] = Segmentacao(I);
 //
-figure; imshow(imagem_seg_1);
+//figure; imshow(imagem_seg_1);
 figure; imshow(imagem_seg_2);
 //
 ////Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
-imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
+//imagem_seg_1 = FiltroMorfologico(imagem_seg_1, 1, 0);
 //figure; imshow(imagem_seg_1);
-//imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
+imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
 //figure; imshow(imagem_seg_2);
 
 //Etapa 4 - Aplicação de quantificadores Entropia, DF e Operador Morfológico
