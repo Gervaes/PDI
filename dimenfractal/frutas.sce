@@ -1,4 +1,4 @@
-img = imread('C:\Users\Grrv\Desktop\PDI\dimenfractal\frutas.jpg');
+img = imread('C:\Users\Grrv\MatLab\PDI\prova\frutas.jpg');
 img = rgb2gray(img);
 
 /*
@@ -55,7 +55,7 @@ function [H]=Entropia(L,x,y)
     //Preenchendo vetor histograma
     for i=(((x-1)*L)+1):x*L
         for j=(((y-1)*L)+1):y*L
-            qtdL(img(i,j)+1) = qtdL(img(i,j)+1) + 1;
+            qtdL(double(double(img(i,j))+1)) = qtdL(double(double(img(i,j))+1)) + 1;
         end
     end
     
@@ -85,7 +85,7 @@ while L > 1,
     y = floor(columns/L);
     for i=1:x
         for j=1:y
-            //H = H + Entropia(L,i,j);
+            H = H + Entropia(L,i,j);
         end
     end
     

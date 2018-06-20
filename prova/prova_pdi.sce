@@ -1,4 +1,4 @@
-function [H]=Entropia(I,L,x,y)
+function [H]=Entropia(imagem,L,x,y)
     //Zerando vetor histograma
     for k=1: 256
         qtdL(k) = 0;
@@ -7,7 +7,7 @@ function [H]=Entropia(I,L,x,y)
     //Preenchendo vetor histograma
     for i=(((x-1)*L)+1):x*L
         for j=(((y-1)*L)+1):y*L
-            qtdL(I(i,j)+1) = qtdL(I(i,j)+1) + 1;
+            qtdL(double(double(imagem(i,j))+1)) = qtdL(double(double(imagem(i,j))+1)) + 1;
         end
     end
     
@@ -26,6 +26,58 @@ function [H]=Entropia(I,L,x,y)
     
     //Multiplicando entropia por -1
     H = H*(-1);
+endfunction
+
+function [H]=EntropiaFinal(imagem)
+    [linhas,colunas] = size(imagem);
+    imagem = imagem*255;
+    
+    //Entropia
+        //Escolhendo L máximo
+        if linhas > colunas then
+            L = colunas;
+        else
+            L = linhas;
+        end
+        
+        //Calculando entropias para cada valor de L
+        cont = 0; 
+        while L > 1
+            H = 0;
+            
+            x = floor(linhas/L);
+            y = floor(colunas/L);
+            for i=1:x
+                for j=1:y
+                    H = H + Entropia(imagem,L,i,j);
+                end
+            end
+            
+            H = (H/(x*y));
+        
+            cont = cont + 1;
+            
+            entropias(cont,1) = double(L);
+            entropias(cont,2) = double(H);
+        
+            mprintf("\nL: %i, H: %f",entropias(cont,1),entropias(cont,2));
+        
+            L = floor(L/2);
+        end
+        
+        //Visualizando entropias
+        //figure, plot(entropias(:,1),entropias(:,2));
+        
+        for i=1:cont
+            entropias(cont,1) = double(log2(double(entropias(cont,1))));
+            entropias(cont,2) = double(log2(double(entropias(cont,2))));
+            //mprintf("\nL: %i, H: %f",entropias(cont,1),entropias(cont,2));
+        end
+        
+        //Visualizando entropias após regressão
+        //figure; plot(entropias(:,1),entropias(:,2));
+
+        //
 endfunction
 
 function [HSI]=ConversaoHSI(imagem)
@@ -151,59 +203,6 @@ function [imagem_seg_1,imagem_seg_2]=Segmentacao(I)
     end
 endfunction
 
-function [ent,df,opmf]=ConstruirVetor(imagem_seg_1,imagem_seg_2,I)
-    [linhas,colunas] = size(I);
-    
-    ent = 0;
-    df = 0;
-    opmf = 0;
-    
-    //Entropia (feita com I)
-        //Escolhendo L máximo
-        if linhas > colunas then
-            L = colunas;
-        else
-            L = linhas;
-        end
-        
-        //Calculando entropias para cada valor de L
-        cont = 0; 
-        while L > 1
-            H = 0;
-            
-            x = floor(linhas/L);
-            y = floor(colunas/L);
-            for i=1:x
-                for j=1:y
-                    H = H + Entropia(I,L,i,j);
-                end
-            end
-            
-            H = (H/(x*y));
-        
-            cont = cont + 1;
-            
-            entropias(cont,1) = L;
-            entropias(cont,2) = H;
-        
-            L = floor(L/2);
-        end
-        
-        //Visualizando entropias
-        figure, plot(entropias(:,1),entropias(:,2));
-        
-        for i=1:cont
-            mprintf("\nL: %i, H: %f",entropias(cont,1),entropias(cont,2));
-            entropias(cont,1) = log10(entropias(cont,1));
-            entropias(cont,2) = log10(entropias(cont,2));
-        end
-        
-        //Visualizando entropias após regressão
-        figure; plot(entropias(:,1),entropias(:,2));
-
-        //
-endfunction
-
 function [imgDilatada]=Dilatacao(img, corObj, corFun, x, y, elemEs, inicio, fim)
     for i=1:x
         for j=1:y
@@ -223,7 +222,7 @@ function [imgDilatada]=Dilatacao(img, corObj, corFun, x, y, elemEs, inicio, fim)
         end
     end
     
-    figure; imshow(imgDilatada);
+    //figure; imshow(imgDilatada);
 endfunction
 
 function [imgErodida]=Erosao(img, corObj, corFun, x, y, elemEs, inicio, fim)
@@ -267,7 +266,7 @@ function [imgErodida]=Erosao(img, corObj, corFun, x, y, elemEs, inicio, fim)
         end
     end
     
-    figure; imshow(imgErodida);
+    //figure; imshow(imgErodida);
 endfunction
 
 function [imagem_seg]=FiltroMorfologico(imagem_seg, corObj, corFun)
@@ -301,19 +300,45 @@ function [imagem_seg]=FiltroMorfologico(imagem_seg, corObj, corFun)
     //figure; imshow(imgErodida);
 endfunction
 
-function OperadorMorfologico(imagem_seg, corObj)
-    [linhas,colunas] = size(imagem_seg);
-    cont = 0;
+//function OperadorMorfologico(imagem_seg, corObj)
+//    [linhas,colunas] = size(imagem_seg);
+//    cont = 0;
+//    
+//    for i=1:linhas
+//        for j=1:colunas
+//            if imagem_seg(i,j) == corObj then
+//                count = cont + 1;
+//            end
+//        end
+//    end
+//    
+//    prob = round(cont/(linhas*colunas));
+//endfunction
+//
+
+function [dimensaofractal]=DimensaoFractal(imagem)
+    //Gerv
+endfunction
+
+function [quantidade]=OperadorMorfologico(imagem)
+    //Marco
+endfunction
+
+function [caracteristicas]=ConstruirVetor(imagem_seg_1,imagem_seg_2,I,caracteristicas,i)
     
-    for i=1:linhas
-        for j=1:colunas
-            if imagem_seg(i,j) == corObj then
-                count = cont + 1;
-            end
-        end
-    end
+    //Calculando entropias para as 3 imagens
+    caracteristicas(i,1) = EntropiaFinal(imagem_seg_1);
+    caracteristicas(i,4) = EntropiaFinal(imagem_seg_2);
+    caracteristicas(i,7) = EntropiaFinal(I);
     
-    prob = round(cont/(linhas*colunas));
+    caracteristicas(i,2) = DimensaoFractal(imagem_seg_1);
+    caracteristicas(i,5) = DimensaoFractal(imagem_seg_2);
+    caracteristicas(i,8) = DimensaoFractal(I);
+    
+    caracteristicas(i,3) = OperadorMorfologico(imagem_seg_1);
+    caracteristicas(i,6) = OperadorMorfologico(imagem_seg_2);
+    caracteristicas(i,9) = OperadorMorfologico(I);
+        
 endfunction
 
 //Classes de imagens
@@ -333,34 +358,32 @@ classeB = ["ytma49_072303_malignant2_ccd.TIF",
            "ytma49_111303_malignant2_ccd.TIF",
            "ytma49_111303_malignant3_ccd.TIF"];
 
+
 //Vetores de características
-caracteristicas = zeros(14,3);
-imagem = imread("C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\ytma49_072303_benign2_ccd.TIF");
-//figure; imshow(imagem);
+caracteristicas = zeros(14,9);
+imagem = imread(classeA(1));
+figure; imshow(imagem); title("Imagem original RGB","fontsize",5);
 
 //Etapa 0 - Conversão para HSI
 HSI = zeros(size(imagem));
 HSI = ConversaoHSI(imagem);
-//figure; imshow(HSI(:,:,3));
+figure; imshow(HSI(:,:,3)); title("ETAPA 0 - Canal I imagem HSI","fontsize",5);
 
-////Etapa 1 - Equalização do canal I
+//Etapa 1 - Equalização do canal I
 I = EqualizacaoI(HSI);
-//figure; imshow(I);
-//
-////Etapa 2 - Segmentação da imagem do canal I
-[imagem_seg_1,imagem_seg_2] = Segmentacao(I);
-//
-//figure; imshow(imagem_seg_1);
-figure; imshow(imagem_seg_2);
-//
-////Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
-//imagem_seg_1 = FiltroMorfologico(imagem_seg_1, 1, 0);
-//figure; imshow(imagem_seg_1);
-imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
-//figure; imshow(imagem_seg_2);
+figure; imshow(I); title("ETAPA 1 - Canal I equalizado","fontsize",5);
 
-//Etapa 4 - Aplicação de quantificadores Entropia, DF e Operador Morfológico
-//OperadorMorfologico(imagem_seg_1,1);
-//
-////Etapa 4 - Compor vetor de características (Entropia, Dimensão Fractal e )
-////[ent,df,opmf] = ConstruirVetor(imagem_seg_1,imagem_seg_2,I);
+//Etapa 2 - Segmentação da imagem do canal I
+[imagem_seg_1,imagem_seg_2] = Segmentacao(I);
+figure; imshow(imagem_seg_1); title("ETAPA 2 - imagem_seg_1","fontsize",5);
+figure; imshow(imagem_seg_2); title("ETAPA 2 - imagem_seg_2","fontsize",5);
+
+//Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
+imagem_seg_1 = FiltroMorfologico(imagem_seg_1, 1, 0);
+imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
+figure; imshow(imagem_seg_1); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
+figure; imshow(imagem_seg_2); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
+
+//Etapa 4 - Compor vetor de características (Entropia, Dimensão Fractal e )
+caracteristicas = ConstruirVetor(imagem_seg_1,imagem_seg_2,I,caracteristicas,1);
+
