@@ -1,13 +1,13 @@
-img = imread('C:\Users\Grrv\MatLab\PDI\prova\frutas.jpg');
-img = rgb2gray(img);
+//img = imread('C:\Users\Grrv\MatLab\PDI\prova\frutas.jpg');
+//img = rgb2gray(img);
 
-/*
+
 // IMAGEM DO EXERCÍCIO
 img=[22,22,22,95,167,234,234,234,
      22,22,22,95,167,234,234,234,
      22,22,22,95,167,234,234,234,
      22,22,22,95,167,234,234,234];
-*/
+
 
 /*
 img = [1,1,1,1,1,1,1,1,

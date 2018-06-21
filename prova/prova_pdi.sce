@@ -42,7 +42,7 @@ function [H]=EntropiaFinal(imagem)
         
         //Calculando entropias para cada valor de L
         cont = 0; 
-        while L > 1
+        while round(L) > 1
             H = 0;
             
             x = floor(linhas/L);
@@ -57,10 +57,12 @@ function [H]=EntropiaFinal(imagem)
         
             cont = cont + 1;
             
-            entropias(cont,1) = double(L);
-            entropias(cont,2) = double(H);
+            //Regressão com log2
+            entropias(cont,1) = log2(L);
+            entropias(cont,2) = log2(H);
         
-            mprintf("\nL: %i, H: %f",entropias(cont,1),entropias(cont,2));
+            mprintf("\nL: %f, H: %f,",entropias(cont,1),entropias(cont,2));
+            //mprintf(" log2(L): %f, log2(H): %f\n",log2(L),log2(H));
         
             L = floor(L/2);
         end
@@ -151,6 +153,8 @@ function [I]=EqualizacaoI(HSI)
         end
     end
     
+    figure; bar(histograma);
+    
     //Preenchendo vetor probabilidade
     for i=1:escala
         probabilidade(i) = double(histograma(i)/total);
@@ -179,6 +183,20 @@ function [I]=EqualizacaoI(HSI)
         probabilidade(i) = double(0);
         histograma(i) = double(0);
     end
+    
+    //Preenchendo vetor histograma
+    for i=1:linhas
+        for j=1:colunas
+            indice = double(HSI(i,j,3)+1);
+            histograma(indice) = histograma(indice) + 1;
+            
+            if HSI(i,j,3) > maior then
+                maior = HSI(i,j,3);
+            end
+        end
+    end
+    
+    figure; bar(histograma);
 
     //Retornando canal I equalizado
     I = HSI(:,:,3)/255;
@@ -300,24 +318,80 @@ function [imagem_seg]=FiltroMorfologico(imagem_seg, corObj, corFun)
     end
 endfunction
 
+function [BoxQtdd]=Contagem(imagem,L,x,y)
+    MI = 0;
+    //Achar maior intensidade na janela
+    for i=(((x-1)*L)+1):x*L
+        for j=(((y-1)*L)+1):y*L
+            if MI < imagem(i,j) then
+                MI = imagem(i,j);
+            end
+        end
+    end
+    
+    //Calcular quantidade de caixas
+    BoxQtdd = ceil(MI/L);
+endfunction
+
 function [dimensaofractal]=DimensaoFractal(imagem)
-    //Gerv
+    imagem = imagem*255;
+    [linhas,colunas] = size(imagem);
+    
+    if linhas > colunas then
+        L = colunas;
+    else
+        L = linhas;
+    end
+
+    MI = 0;
+    for i=1:linhas
+        for j=1:colunas
+            if MI < imagem(i,j) then
+                MI = imagem(i,j);
+            end
+        end
+    end
+
+    if L > MI then
+        L = MI;
+    end
+    
+    cont = 0;
+    while L > 1,
+        BoxQtdd = 0;
+        x = floor(linhas/L);
+        y = floor(colunas/L);
+        for i=1:x
+            for j=1:y
+                BoxQtdd = BoxQtdd + Contagem(imagem,L,i,j);
+            end
+        end
+        
+        cont = cont + 1;
+            
+        dfs(cont,1) = double(L);
+        dfs(cont,2) = double(BoxQtdd);
+        
+        L = floor(L/2);
+    end
+    
+    dimensaofractal =1;
 endfunction
 
 function [caracteristicas]=ConstruirVetor(imagem_seg_1,imagem_seg_2,I,caracteristicas,i)
     
     //Calculando entropias para as 3 imagens
-    caracteristicas(i,1) = EntropiaFinal(imagem_seg_1);
-    caracteristicas(i,4) = EntropiaFinal(imagem_seg_2);
-    caracteristicas(i,7) = EntropiaFinal(I);
+    //caracteristicas(i,1) = EntropiaFinal(imagem_seg_1);
+    //caracteristicas(i,4) = EntropiaFinal(imagem_seg_2);
+    //caracteristicas(i,7) = EntropiaFinal(I);
     
     caracteristicas(i,2) = DimensaoFractal(imagem_seg_1);
     caracteristicas(i,5) = DimensaoFractal(imagem_seg_2);
     caracteristicas(i,8) = DimensaoFractal(I);
     
-    caracteristicas(i,3) = OperadorMorfologico(imagem_seg_1, 1, 0);
-    caracteristicas(i,6) = OperadorMorfologico(imagem_seg_2, 0, 1);
-    caracteristicas(i,9) = OperadorMorfologico(I, 0, 1);
+    //caracteristicas(i,3) = OperadorMorfologico(imagem_seg_1, 1, 0);
+    //caracteristicas(i,6) = OperadorMorfologico(imagem_seg_2, 0, 1);
+    //caracteristicas(i,9) = OperadorMorfologico(I, 0, 1);
         
 endfunction
 
@@ -377,48 +451,54 @@ function [nElementos]=OperadorMorfologico(img, corObj, corFun)
 endfunction
 
 //Classes de imagens
-classeA = ["C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\ytma49_072303_benign2_ccd.TIF",
-           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_A_hist_mama_benigna\ytma49_111003_benign1_ccd.TIF",
-           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_A_hist_mama_benigna\ytma49_111003_benign2_ccd.TIF",
-           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_A_hist_mama_benigna\ytma49_111003_benign3_ccd.TIF",
-           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_A_hist_mama_benigna\ytma49_111303_benign1_ccd.TIF",
-           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_A_hist_mama_benigna\ytma49_111303_benign2_ccd.TIF",
-           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_A_hist_mama_benigna\ytma49_111303_benign3_ccd.TIF"];
+classeA = ["ytma49_072303_benign2_ccd.TIF",
+           "ytma49_111003_benign1_ccd.TIF",
+           "ytma49_111003_benign2_ccd.TIF",
+           "ytma49_111003_benign3_ccd.TIF",
+           "ytma49_111303_benign1_ccd.TIF",
+           "ytma49_111303_benign2_ccd.TIF",
+           "ytma49_111303_benign3_ccd.TIF"];
 
-classeB = ["C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_072303_malignant2_ccd.TIF",
-           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_111003_malignant1_ccd.TIF",
-           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_111003_malignant2_ccd.TIF",
-           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_111003_malignant3_ccd.TIF",
-           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_111303_malignant1_ccd.TIF",
-           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_111303_malignant2_ccd.TIF",
-           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_111303_malignant3_ccd.TIF"];
+classeB = ["ytma49_072303_malignant2_ccd.TIF",
+           "ytma49_111003_malignant1_ccd.TIF",
+           "ytma49_111003_malignant2_ccd.TIF",
+           "ytma49_111003_malignant3_ccd.TIF",
+           "ytma49_111303_malignant1_ccd.TIF",
+           "ytma49_111303_malignant2_ccd.TIF",
+           "ytma49_111303_malignant3_ccd.TIF"];
 
 
 //Vetores de características
 caracteristicas = zeros(14,9);
-imagem = imread(classeB(7));
-//figure; imshow(imagem); title("Imagem original RGB","fontsize",5);
 
-//Etapa 0 - Conversão para HSI
-HSI = zeros(size(imagem));
-HSI = ConversaoHSI(imagem);
-//figure; imshow(HSI(:,:,3)); title("ETAPA 0 - Canal I imagem HSI","fontsize",5);
-
-//Etapa 1 - Equalização do canal I
-I = EqualizacaoI(HSI);
-figure; imshow(I); title("ETAPA 1 - Canal I equalizado","fontsize",5);
-
-//Etapa 2 - Segmentação da imagem do canal I
-[imagem_seg_1,imagem_seg_2] = Segmentacao(I);
-//figure; imshow(imagem_seg_1); title("ETAPA 2 - imagem_seg_1","fontsize",5);
-//figure; imshow(imagem_seg_2); title("ETAPA 2 - imagem_seg_2","fontsize",5);
-
-//Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
-imagem_seg_1 = FiltroMorfologico(imagem_seg_1, 1, 0);
-imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
-figure; imshow(imagem_seg_1); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
-figure; imshow(imagem_seg_2); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
-
-//Etapa 4 - Compor vetor de características (Entropia, Dimensão Fractal e )
-caracteristicas = ConstruirVetor(imagem_seg_1,imagem_seg_2,I,caracteristicas,1);
-
+for i=1:14
+    if i <= 7 then
+        imagem = imread(classeA(i));
+    else
+        imagem = imread(classeB(i-7));
+    end
+    //figure; imshow(imagem); title("Imagem original RGB","fontsize",5);
+    
+    //Etapa 0 - Conversão para HSI
+    HSI = zeros(size(imagem));
+    HSI = ConversaoHSI(imagem);
+    //figure; imshow(HSI(:,:,3)); title("ETAPA 0 - Canal I imagem HSI","fontsize",5);
+    
+    //Etapa 1 - Equalização do canal I
+    I = EqualizacaoI(HSI);
+    figure; imshow(I); title("ETAPA 1 - Canal I equalizado","fontsize",5);
+    
+    //Etapa 2 - Segmentação da imagem do canal I
+    [imagem_seg_1,imagem_seg_2] = Segmentacao(I);
+    figure; imshow(imagem_seg_1); title("ETAPA 2 - imagem_seg_1","fontsize",5);
+    figure; imshow(imagem_seg_2); title("ETAPA 2 - imagem_seg_2","fontsize",5);
+    
+    //Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
+    imagem_seg_1 = FiltroMorfologico(imagem_seg_1, 1, 0);
+    imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
+    figure; imshow(imagem_seg_1); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
+    figure; imshow(imagem_seg_2); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
+    
+    //Etapa 4 - Compor vetor de características (Entropia, Dimensão Fractal e )
+    caracteristicas = ConstruirVetor(imagem_seg_1,imagem_seg_2,I,caracteristicas,i);
+end
