@@ -221,8 +221,6 @@ function [imgDilatada]=Dilatacao(img, corObj, corFun, x, y, elemEs, inicio, fim)
             end
         end
     end
-    
-    //figure; imshow(imgDilatada);
 endfunction
 
 function [imgErodida]=Erosao(img, corObj, corFun, x, y, elemEs, inicio, fim)
@@ -265,8 +263,6 @@ function [imgErodida]=Erosao(img, corObj, corFun, x, y, elemEs, inicio, fim)
             count = 0;
         end
     end
-    
-    //figure; imshow(imgErodida);
 endfunction
 
 function [imagem_seg]=FiltroMorfologico(imagem_seg, corObj, corFun)
@@ -290,38 +286,22 @@ function [imagem_seg]=FiltroMorfologico(imagem_seg, corObj, corFun)
             imgExt(i,j) = imagem_seg(i-elemEs,j-elemEs);
         end
     end
+    
+    //Aplicando abertura
     imgErodida = Erosao(imgExt,corObj,corFun,x,y,elemEs,inicio,fim);
     imgDilatada = Dilatacao(imgErodida,corObj,corFun,x,y,elemEs,inicio,fim);
     
-//    imgErodida = Erosao(imgDilatada,corObj,corFun,x,y,elemEs,inicio,fim);
+    [linhas,colunas] = size(imgDilatada);
     
-//    imgErodida = Erosao(imgErodida,corObj,corFun,x,y,elemEs,inicio,fim);
-    
-    //figure; imshow(imgErodida);
+    for i=inicio:(x-fim)
+        for j=inicio:(y-fim)
+            imagem_seg(i-elemEs,j-elemEs) = imgDilatada(i,j);
+        end
+    end
 endfunction
-
-//function OperadorMorfologico(imagem_seg, corObj)
-//    [linhas,colunas] = size(imagem_seg);
-//    cont = 0;
-//    
-//    for i=1:linhas
-//        for j=1:colunas
-//            if imagem_seg(i,j) == corObj then
-//                count = cont + 1;
-//            end
-//        end
-//    end
-//    
-//    prob = round(cont/(linhas*colunas));
-//endfunction
-//
 
 function [dimensaofractal]=DimensaoFractal(imagem)
     //Gerv
-endfunction
-
-function [quantidade]=OperadorMorfologico(imagem)
-    //Marco
 endfunction
 
 function [caracteristicas]=ConstruirVetor(imagem_seg_1,imagem_seg_2,I,caracteristicas,i)
@@ -335,39 +315,94 @@ function [caracteristicas]=ConstruirVetor(imagem_seg_1,imagem_seg_2,I,caracteris
     caracteristicas(i,5) = DimensaoFractal(imagem_seg_2);
     caracteristicas(i,8) = DimensaoFractal(I);
     
-    caracteristicas(i,3) = OperadorMorfologico(imagem_seg_1);
-    caracteristicas(i,6) = OperadorMorfologico(imagem_seg_2);
-    caracteristicas(i,9) = OperadorMorfologico(I);
+    caracteristicas(i,3) = OperadorMorfologico(imagem_seg_1, 1, 0);
+    caracteristicas(i,6) = OperadorMorfologico(imagem_seg_2, 0, 1);
+    caracteristicas(i,9) = OperadorMorfologico(I, 0, 1);
         
 endfunction
 
-//Classes de imagens
-classeA = ["ytma49_072303_benign2_ccd.TIF",
-           "ytma49_111003_benign1_ccd.TIF",
-           "ytma49_111003_benign2_ccd.TIF",
-           "ytma49_111003_benign3_ccd.TIF",
-           "ytma49_111303_benign1_ccd.TIF",
-           "ytma49_111303_benign2_ccd.TIF",
-           "ytma49_111303_benign3_ccd.TIF"];
+function [nElementos]=OperadorMorfologico(img, corObj, corFun)
+    [linhas,colunas] = size(img);
+    pxBranco = 0;
+    nElementos = 0;
+    
+    //cálculo de pixels brancos na imagem
+    for i=1:linhas
+        for j=1:colunas
+            if img(i,j) == corObj then
+                pxBranco = pxBranco + 1;
+            end
+        end
+    end
+    
+    //cálculo de total de pixels na imagem
+    pxTotal = linhas*colunas;
+    
+    //cálculo de probabilidade de pixels brancos
+    prob = double(pxBranco/pxTotal);
+    
+    elemEst = 256;
+    i = 1;
+    j = 1;
+    
+    //elemento estruturante: matriz 8x8
+    while i+15 < linhas,
+        x = i+15;
+        y = j+15;
+        brParcial = 0;
+        probParcial = 0;
+        
+        for k=i:x;
+            for l=j:y;
+                if img(k,l) == corObj then
+                    brParcial = brParcial + 1;
+                end
+            end
+        end
+        
+        probParcial = double(brParcial/elemEst);
+        
+        if probParcial >= prob then
+            nElementos = nElementos + 1;
+        end
+        
+        if y == colunas then
+            j = 1;
+            i = x+1;
+        else
+            j = y+1;
+        end
+        
+    end
+endfunction
 
-classeB = ["ytma49_072303_malignant2_ccd.TIF",
-           "ytma49_111003_malignant1_ccd.TIF",
-           "ytma49_111003_malignant2_ccd.TIF",
-           "ytma49_111003_malignant3_ccd.TIF",
-           "ytma49_111303_malignant1_ccd.TIF",
-           "ytma49_111303_malignant2_ccd.TIF",
-           "ytma49_111303_malignant3_ccd.TIF"];
+//Classes de imagens
+classeA = ["C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\ytma49_072303_benign2_ccd.TIF",
+           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_A_hist_mama_benigna\ytma49_111003_benign1_ccd.TIF",
+           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_A_hist_mama_benigna\ytma49_111003_benign2_ccd.TIF",
+           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_A_hist_mama_benigna\ytma49_111003_benign3_ccd.TIF",
+           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_A_hist_mama_benigna\ytma49_111303_benign1_ccd.TIF",
+           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_A_hist_mama_benigna\ytma49_111303_benign2_ccd.TIF",
+           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_A_hist_mama_benigna\ytma49_111303_benign3_ccd.TIF"];
+
+classeB = ["C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_072303_malignant2_ccd.TIF",
+           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_111003_malignant1_ccd.TIF",
+           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_111003_malignant2_ccd.TIF",
+           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_111003_malignant3_ccd.TIF",
+           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_111303_malignant1_ccd.TIF",
+           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_111303_malignant2_ccd.TIF",
+           "C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\Dupla6\Classe_B_hist_mama_maligna\ytma49_111303_malignant3_ccd.TIF"];
 
 
 //Vetores de características
 caracteristicas = zeros(14,9);
-imagem = imread(classeA(1));
-figure; imshow(imagem); title("Imagem original RGB","fontsize",5);
+imagem = imread(classeB(7));
+//figure; imshow(imagem); title("Imagem original RGB","fontsize",5);
 
 //Etapa 0 - Conversão para HSI
 HSI = zeros(size(imagem));
 HSI = ConversaoHSI(imagem);
-figure; imshow(HSI(:,:,3)); title("ETAPA 0 - Canal I imagem HSI","fontsize",5);
+//figure; imshow(HSI(:,:,3)); title("ETAPA 0 - Canal I imagem HSI","fontsize",5);
 
 //Etapa 1 - Equalização do canal I
 I = EqualizacaoI(HSI);
@@ -375,8 +410,8 @@ figure; imshow(I); title("ETAPA 1 - Canal I equalizado","fontsize",5);
 
 //Etapa 2 - Segmentação da imagem do canal I
 [imagem_seg_1,imagem_seg_2] = Segmentacao(I);
-figure; imshow(imagem_seg_1); title("ETAPA 2 - imagem_seg_1","fontsize",5);
-figure; imshow(imagem_seg_2); title("ETAPA 2 - imagem_seg_2","fontsize",5);
+//figure; imshow(imagem_seg_1); title("ETAPA 2 - imagem_seg_1","fontsize",5);
+//figure; imshow(imagem_seg_2); title("ETAPA 2 - imagem_seg_2","fontsize",5);
 
 //Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
 imagem_seg_1 = FiltroMorfologico(imagem_seg_1, 1, 0);

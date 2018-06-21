@@ -1,0 +1,137 @@
+1º teste: ClasseA(1)
+
+img_seg_1: 714
+img_seg_2: 714
+I: 110
+
+média: 512
+
+---------------------------
+
+2º teste: ClasseA(2)
+
+img_seg_1: ???
+img_seg_2: ???
+I: ???
+
+média: 
+
+---------------------------
+
+3º teste: ClasseA(3)
+
+img_seg_1: 783
+img_seg_2: 783
+I: 51
+
+média: 539
+
+---------------------------
+
+4º teste: ClasseA(4)
+
+img_seg_1: 609
+img_seg_2: 609
+I: 18
+
+média: 412
+
+---------------------------
+
+5º teste: ClasseA(5)
+
+img_seg_1: 679
+img_seg_2: 679
+I: 96
+
+média: 484
+
+---------------------------
+
+6º teste: ClasseA(6)
+
+img_seg_1: 711
+img_seg_2: 711
+I: 142
+
+média: 521
+
+---------------------------
+
+7º teste: ClasseA(7)
+
+img_seg_1: 578
+img_seg_2: 578
+I: 110
+
+média: 422
+
+---------------------------
+
+8º teste: ClasseB(1)
+
+img_seg_1: 645
+img_seg_2: 645
+I: 40
+
+média: 443
+
+---------------------------
+
+9º teste: ClasseB(2)
+
+img_seg_1: ???
+img_seg_2: ???
+I: ???
+
+média: ???
+
+---------------------------
+
+10º teste: ClasseB(3)
+
+img_seg_1: 679
+img_seg_2: 679
+I: 122
+
+média: 493
+
+---------------------------
+
+11º teste: ClasseB(4)
+
+img_seg_1: 681
+img_seg_2: 681
+I: 87
+
+média: 483
+
+---------------------------
+
+12º teste: ClasseB(5)
+
+img_seg_1: ???
+img_seg_2: ???
+I: ???
+
+média: ???
+
+---------------------------
+
+13º teste: ClasseB(6)
+
+img_seg_1: 642
+img_seg_2: 642
+I: 79
+
+média: 454
+
+---------------------------
+
+14º teste: ClasseB(7)
+
+img_seg_1: 735
+img_seg_2: 735
+I: 99
+
+média: 523
