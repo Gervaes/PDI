@@ -62,7 +62,7 @@ function [H]=EntropiaFinal(imagem)
             entropias(cont,2) = log2(H);
         
             mprintf("\nL: %f, H: %f,",entropias(cont,1),entropias(cont,2));
-            //mprintf(" log2(L): %f, log2(H): %f\n",log2(L),log2(H));
+            
         
             L = floor(L/2);
         end
@@ -76,9 +76,7 @@ function [H]=EntropiaFinal(imagem)
             //mprintf("\nL: %i, H: %f",entropias(cont,1),entropias(cont,2));
         end
         
-        //Visualizando entropias após regressão
-        //figure; plot(entropias(:,1),entropias(:,2));
-
+        H = entropias(cont,2);
         //
 endfunction
 
@@ -207,9 +205,6 @@ function [imagem_seg_1,imagem_seg_2]=Segmentacao(I)
     
     [linhas,colunas] = size(I);
     
-    //imagem_seg_1 = zeros(size(I)); //Imagem abaixo/igual do limiar
-    //imagem_seg_2 = zeros(size(I)); //Imagem acima do limiar
-    
     for i=1:linhas
         for j=1:colunas
             if I(i,j) <= limiar
@@ -334,6 +329,7 @@ function [BoxQtdd]=Contagem(imagem,L,x,y)
 endfunction
 
 function [dimensaofractal]=DimensaoFractal(imagem)
+    dimensaofractal =0;
     imagem = imagem*255;
     [linhas,colunas] = size(imagem);
     
@@ -370,28 +366,27 @@ function [dimensaofractal]=DimensaoFractal(imagem)
         cont = cont + 1;
             
         dfs(cont,1) = double(L);
-        dfs(cont,2) = double(log2(BoxQtdd)/log2(2^cont));
+        dfs(cont,2) = double(BoxQtdd);
         
         L = floor(L/2);
     end
     
-    dimensaofractal =1;
 endfunction
 
 function [caracteristicas]=ConstruirVetor(imagem_seg_1,imagem_seg_2,I,caracteristicas,i)
     
     //Calculando entropias para as 3 imagens
-    //caracteristicas(i,1) = EntropiaFinal(imagem_seg_1);
-    //caracteristicas(i,4) = EntropiaFinal(imagem_seg_2);
-    //caracteristicas(i,7) = EntropiaFinal(I);
+    caracteristicas(i,1) = EntropiaFinal(imagem_seg_1);
+    caracteristicas(i,4) = EntropiaFinal(imagem_seg_2);
+    caracteristicas(i,7) = EntropiaFinal(I);
     
     caracteristicas(i,2) = DimensaoFractal(imagem_seg_1);
     caracteristicas(i,5) = DimensaoFractal(imagem_seg_2);
     caracteristicas(i,8) = DimensaoFractal(I);
     
-    //caracteristicas(i,3) = OperadorMorfologico(imagem_seg_1, 1, 0);
-    //caracteristicas(i,6) = OperadorMorfologico(imagem_seg_2, 0, 1);
-    //caracteristicas(i,9) = OperadorMorfologico(I, 0, 1);
+    caracteristicas(i,3) = OperadorMorfologico(imagem_seg_1, 1, 0);
+    caracteristicas(i,6) = OperadorMorfologico(imagem_seg_2, 0, 1);
+    caracteristicas(i,9) = OperadorMorfologico(I, 0, 1);
         
 endfunction
 
@@ -480,24 +475,23 @@ caracteristicas = zeros(14,9);
     //Etapa 0 - Conversão para HSI
     HSI = zeros(size(imagem));
     HSI = ConversaoHSI(imagem);
-    //figure; imshow(HSI(:,:,3)); title("ETAPA 0 - Canal I imagem HSI","fontsize",5);
+    figure; imshow(HSI(:,:,3)); title("ETAPA 0 - Canal I imagem HSI","fontsize",5);
     
     //Etapa 1 - Equalização do canal I
     I = EqualizacaoI(HSI);
-    //figure; imshow(I); title("ETAPA 1 - Canal I equalizado","fontsize",5);
+    figure; imshow(I); title("ETAPA 1 - Canal I equalizado","fontsize",5);
     
     //Etapa 2 - Segmentação da imagem do canal I
     [imagem_seg_1,imagem_seg_2] = Segmentacao(I);
-    //figure; imshow(imagem_seg_1); title("ETAPA 2 - imagem_seg_1","fontsize",5);
-    //figure; imshow(imagem_seg_2); title("ETAPA 2 - imagem_seg_2","fontsize",5);
+    figure; imshow(imagem_seg_1); title("ETAPA 2 - imagem_seg_1","fontsize",5);
+    figure; imshow(imagem_seg_2); title("ETAPA 2 - imagem_seg_2","fontsize",5);
     
     //Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
     imagem_seg_1 = FiltroMorfologico(imagem_seg_1, 1, 0);
     imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
-    //figure; imshow(imagem_seg_1); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
-    //figure; imshow(imagem_seg_2); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
+    figure; imshow(imagem_seg_1); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
+    figure; imshow(imagem_seg_2); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
     
     //Etapa 4 - Compor vetor de características (Entropia, Dimensão Fractal e )
-    //caracteristicas = ConstruirVetor(imagem_seg_1,imagem_seg_2,I,caracteristicas,i);
-    imagem_seg_1 = DimensaoFractal(imagem_seg_1);
+    caracteristicas = ConstruirVetor(imagem_seg_1,imagem_seg_2,I,caracteristicas,i);
 //end

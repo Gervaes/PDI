@@ -1,13 +1,19 @@
 //img = imread('C:\Users\Grrv\MatLab\PDI\prova\frutas.jpg');
 //img = rgb2gray(img);
 
-
+/*
 // IMAGEM DO EXERCÍCIO
 img=[22,22,22,95,167,234,234,234,
      22,22,22,95,167,234,234,234,
      22,22,22,95,167,234,234,234,
      22,22,22,95,167,234,234,234];
+*/
 
+for i=1:255
+    for j=1:255
+        img(i,j)=255;
+    end
+end
 
 /*
 img = [1,1,1,1,1,1,1,1,
@@ -137,6 +143,8 @@ function [BoxQtdd]=Contagem(L,x,y)
 endfunction
 
 mprintf("\n\n Valores de Box (L) e número de caixas necessárias para a imagem associada\n\n");
+
+cont = 0;
 while L > 1,
     BoxQtdd = 0;
     mprintf("para L = %i o número necessário de caixas é = ",L);
@@ -149,7 +157,10 @@ while L > 1,
         end
     end
     
-    mprintf("%i\n",BoxQtdd);
+    mprintf("%i",BoxQtdd);
+    
+    cont = cont + 1;
+    mprintf("      DF: %f\n",double(log2(BoxQtdd)/log2(2^cont)));
 
     L = floor(L/2);
 end
