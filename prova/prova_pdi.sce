@@ -370,7 +370,7 @@ function [dimensaofractal]=DimensaoFractal(imagem)
         cont = cont + 1;
             
         dfs(cont,1) = double(L);
-        dfs(cont,2) = double(BoxQtdd);
+        dfs(cont,2) = double(log2(BoxQtdd)/log2(2^cont));
         
         L = floor(L/2);
     end
@@ -471,12 +471,10 @@ classeB = ["ytma49_072303_malignant2_ccd.TIF",
 //Vetores de características
 caracteristicas = zeros(14,9);
 
-for i=1:14
-    if i <= 7 then
-        imagem = imread(classeA(i));
-    else
-        imagem = imread(classeB(i-7));
-    end
+//for i=1:14
+    //if i <= 7 then
+        imagem = imread("C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\ytma49_072303_benign2_ccd.TIF");
+    //
     //figure; imshow(imagem); title("Imagem original RGB","fontsize",5);
     
     //Etapa 0 - Conversão para HSI
@@ -486,19 +484,20 @@ for i=1:14
     
     //Etapa 1 - Equalização do canal I
     I = EqualizacaoI(HSI);
-    figure; imshow(I); title("ETAPA 1 - Canal I equalizado","fontsize",5);
+    //figure; imshow(I); title("ETAPA 1 - Canal I equalizado","fontsize",5);
     
     //Etapa 2 - Segmentação da imagem do canal I
     [imagem_seg_1,imagem_seg_2] = Segmentacao(I);
-    figure; imshow(imagem_seg_1); title("ETAPA 2 - imagem_seg_1","fontsize",5);
-    figure; imshow(imagem_seg_2); title("ETAPA 2 - imagem_seg_2","fontsize",5);
+    //figure; imshow(imagem_seg_1); title("ETAPA 2 - imagem_seg_1","fontsize",5);
+    //figure; imshow(imagem_seg_2); title("ETAPA 2 - imagem_seg_2","fontsize",5);
     
     //Etapa 3 - Aplicar filtro morfológico nas duas imagens imagem_seg
     imagem_seg_1 = FiltroMorfologico(imagem_seg_1, 1, 0);
     imagem_seg_2 = FiltroMorfologico(imagem_seg_2, 0, 1);
-    figure; imshow(imagem_seg_1); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
-    figure; imshow(imagem_seg_2); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
+    //figure; imshow(imagem_seg_1); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
+    //figure; imshow(imagem_seg_2); title("ETAPA 3 - imagem_seg_2 após filtro","fontsize",5);
     
     //Etapa 4 - Compor vetor de características (Entropia, Dimensão Fractal e )
-    caracteristicas = ConstruirVetor(imagem_seg_1,imagem_seg_2,I,caracteristicas,i);
-end
+    //caracteristicas = ConstruirVetor(imagem_seg_1,imagem_seg_2,I,caracteristicas,i);
+    imagem_seg_1 = DimensaoFractal(imagem_seg_1);
+//end
