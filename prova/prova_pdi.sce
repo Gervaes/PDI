@@ -466,10 +466,13 @@ classeB = ["ytma49_072303_malignant2_ccd.TIF",
 //Vetores de características
 caracteristicas = zeros(14,9);
 
-//for i=1:14
-    //if i <= 7 then
-        imagem = imread("C:\Users\marco\OneDrive\Documentos\GitHub\PDI\prova\ytma49_072303_benign2_ccd.TIF");
-    //
+/for i=1:14
+    if i <= 7 then
+        imagem = imread(classeA(i));
+    else
+        imagem = imread(classeB(i-7));
+    end
+    
     //figure; imshow(imagem); title("Imagem original RGB","fontsize",5);
     
     //Etapa 0 - Conversão para HSI
